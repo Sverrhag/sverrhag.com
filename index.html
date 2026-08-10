@@ -33,12 +33,12 @@
       </picture>
     </div>
     <div class="hero-content">
-      <div class="hero-portrait">
+      <button type="button" class="hero-portrait" id="portrait-trigger" aria-haspopup="dialog" aria-label="Open full-size photo">
         <picture>
           <source srcset="assets/img/headshot.webp" type="image/webp">
           <img src="assets/img/headshot.jpg" alt="Portrait of Christian Sverrhag">
         </picture>
-      </div>
+      </button>
       <h1>Sverrhag Consulting</h1>
       <p class="hero-tagline">A home for small projects and experiments.</p>
     </div>
@@ -49,6 +49,11 @@
     <div class="projects-grid" id="projects-grid"></div>
   </section>
 </main>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Full-size photo" hidden>
+  <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+  <img src="assets/img/headshot.jpg" alt="Portrait of Christian Sverrhag">
+</div>
 
 <footer class="site-footer">
   <span>&copy; <span id="year"></span> Sverrhag Consulting</span>

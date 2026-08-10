@@ -149,20 +149,76 @@ body {
 }
 
 .hero-portrait {
-  width: 108px;
-  height: 108px;
+  width: clamp(140px, 16vw, 190px);
+  height: clamp(140px, 16vw, 190px);
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid var(--amber);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
   flex-shrink: 0;
+  padding: 0;
+  background: none;
+  appearance: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-portrait:hover,
+.hero-portrait:focus-visible {
+  transform: scale(1.04);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
 }
 
 .hero-portrait img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 18%;
+  object-position: center 32%;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(10, 7, 4, 0.88);
+  backdrop-filter: blur(4px);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox img {
+  max-width: min(90vw, 560px);
+  max-height: 85vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1.25rem;
+  right: clamp(1.25rem, 4vw, 3rem);
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-raised);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.lightbox-close:hover {
+  border-color: var(--amber);
+  color: var(--amber);
 }
 
 .hero-content h1 {
