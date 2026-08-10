@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sverrhag Consulting</title>
+<meta name="description" content="Sverrhag Consulting — a home for small projects and experiments.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="logo" aria-label="Sverrhag Consulting home">
+    <span>Sverrhag</span>
+    <span>Consulting</span>
+  </a>
+  <nav class="site-nav">
+    <a href="#projects">Projects</a>
+    <a href="https://www.linkedin.com/in/christiansverrhag/" target="_blank" rel="noopener">LinkedIn</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-media">
+      <picture>
+        <source srcset="assets/img/hero.webp" type="image/webp">
+        <img src="assets/img/hero.jpg" alt="Silhouette of a handstand on a floating platform at sunset over the sea" loading="eager">
+      </picture>
+    </div>
+    <div class="hero-content">
+      <div class="hero-portrait">
+        <picture>
+          <source srcset="assets/img/headshot.webp" type="image/webp">
+          <img src="assets/img/headshot.jpg" alt="Portrait of Christian Sverrhag">
+        </picture>
+      </div>
+      <h1>Sverrhag Consulting</h1>
+      <p class="hero-tagline">A home for small projects and experiments.</p>
+    </div>
+  </section>
+
+  <section id="projects" class="projects">
+    <h2>Projects</h2>
+    <div class="projects-grid" id="projects-grid"></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <span>&copy; <span id="year"></span> Sverrhag Consulting</span>
+  <a href="https://www.linkedin.com/in/christiansverrhag/" target="_blank" rel="noopener">LinkedIn</a>
+</footer>
+
+<script src="projects/projects.js" defer></script>
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>
