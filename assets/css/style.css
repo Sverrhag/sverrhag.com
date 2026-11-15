@@ -327,8 +327,8 @@ body {
 
 .project-thumb img {
   width: 100%;
-  aspect-ratio: 16 / 7;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 .project-card:hover {
