@@ -42,10 +42,10 @@ window.PROJECTS = [
     title: "Best Move Chess",
     description:
       "A chess trainer in the browser. Every move you play is checked against Stockfish. Match the engine's best move to build a streak, or switch to Training Mode and get each mistake explained in plain language, read aloud if you like, in 20 languages. Drill openings and earn badges, take the daily challenge, or send a friend the exact same game.",
-    // Coming soon: chess.sverrhag.com isn't confirmed live yet, so this
-    // links to the source for now. Swap to "https://chess.sverrhag.com"
-    // once the server answers at GET /api/health.
-    url: "https://github.com/sverrhag/best-move-chess",
+    // Coming soon: no public url yet. The GitHub repo is private, so it
+    // can't be linked either. Add "url: https://chess.sverrhag.com" once
+    // that server answers at GET /api/health — the card becomes clickable
+    // automatically as soon as a url is present.
     tags: ["Coming soon", "Chess", "Game"],
     thumbnail: "assets/img/projects/best-move-chess.jpg",
   },

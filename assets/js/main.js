@@ -37,11 +37,15 @@ if (projects.length === 0) {
   `;
 } else {
   grid.innerHTML = projects
-    .map(
-      (p) => `
-      <a class="project-card" href="${p.url}"${
-        /^https?:\/\//.test(p.url) ? ' target="_blank" rel="noopener"' : ""
-      }>
+    .map((p) => {
+      const tag = p.url ? "a" : "div";
+      const linkAttrs = p.url
+        ? ` href="${p.url}"${
+            /^https?:\/\//.test(p.url) ? ' target="_blank" rel="noopener"' : ""
+          }`
+        : "";
+      return `
+      <${tag} class="project-card"${linkAttrs}>
         ${
           p.thumbnail
             ? `<div class="project-thumb">
@@ -61,7 +65,7 @@ if (projects.length === 0) {
                 .join("")}</div>`
             : ""
         }
-      </a>`
-    )
+      </${tag}>`;
+    })
     .join("");
 }
