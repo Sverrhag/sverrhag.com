@@ -40,6 +40,16 @@ if (projects.length === 0) {
     .map(
       (p) => `
       <a class="project-card" href="${p.url}">
+        ${
+          p.thumbnail
+            ? `<div class="project-thumb">
+                <picture>
+                  <source srcset="${p.thumbnail.replace(/\.(jpg|jpeg|png)$/i, ".webp")}" type="image/webp">
+                  <img src="${p.thumbnail}" alt="" loading="lazy">
+                </picture>
+              </div>`
+            : ""
+        }
         <h3>${p.title}</h3>
         <p>${p.description}</p>
         ${
