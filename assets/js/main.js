@@ -39,7 +39,9 @@ if (projects.length === 0) {
   grid.innerHTML = projects
     .map(
       (p) => `
-      <a class="project-card" href="${p.url}">
+      <a class="project-card" href="${p.url}"${
+        /^https?:\/\//.test(p.url) ? ' target="_blank" rel="noopener"' : ""
+      }>
         ${
           p.thumbnail
             ? `<div class="project-thumb">
