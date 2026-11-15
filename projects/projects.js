@@ -18,11 +18,11 @@
 
 window.PROJECTS = [
   {
-    title: "Letter Adventure",
+    title: "Letter Adventures",
     description:
-      "A playful letter game for children ages 3 to 7. Nine games across five difficulty levels: type the alphabet, find letters, match big and small, spell words, match pictures to words, read words, find the first letter, and spot a missing one — guided by cheerful recorded voices with unicorns and ladybugs. In Swedish and English.",
-    url: "projects/letter-adventure/",
-    tags: ["Kids", "Game", "Svenska / English"],
+      "A playful letter and word game for children ages 3 to 7. Nine games across five difficulty levels: type the alphabet, find letters, match big and small, spell words, match pictures to words, read words, find the first letter, and spot a missing one — guided by cheerful recorded voices with unicorns and ladybugs. In English, Spanish, French, Portuguese, German and Swedish.",
+    url: "https://letteradventures.com/",
+    tags: ["Kids", "Game", "6 languages"],
     thumbnail: "assets/img/projects/letter-adventure.jpg",
     stats: {
       namespace: "sverrhag-letter-adventure",
@@ -30,6 +30,10 @@ window.PROJECTS = [
         { key: "players", label: "Players (once per browser)" },
         { key: "lang-sv", label: "Chose Swedish" },
         { key: "lang-en", label: "Chose English" },
+        { key: "lang-es", label: "Chose Spanish" },
+        { key: "lang-fr", label: "Chose French" },
+        { key: "lang-pt", label: "Chose Portuguese" },
+        { key: "lang-de", label: "Chose German" },
         { key: "game-alfabet", label: "The alphabet, starts" },
         { key: "game-hitta", label: "Find the letter, starts" },
         { key: "game-lyssna", label: "Listen, starts" },
