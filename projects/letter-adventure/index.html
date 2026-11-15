@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Letter Adventure</title>
+<meta name="description" content="A playful letter-learning game for children from about age 4, in Swedish and English. Five small games with a cheerful voice guide, unicorns and ladybugs.">
+<meta property="og:title" content="Letter Adventure / Bokstavsäventyret">
+<meta property="og:description" content="A playful letter-learning game for young children, in Swedish and English.">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦄%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@400;600;700&display=swap">
+<style>
+/* Layout: one screen at a time, everything fits without scrolling on a tablet.
+   Top: guide bubble. Middle: big letter. Bottom: progress + keyboard. */
+:root{
+  --sky1:#ffd9ec; --sky2:#e9dcff; --sky3:#d2f0ff;
+  --card:#ffffff; --ink:#48266b; --ink-soft:#7d5f9c;
+  --pink:#ff5fa2; --pink-deep:#d92d7f;
+  --r1:#ff7a93; --r2:#ffa552; --r3:#ffd84a; --r4:#6ad895; --r5:#69bcff; --r6:#b893ff;
+  --on-color:#3a1b5c;
+  --shadow:rgba(110,60,160,.28); --line:rgba(110,60,160,.18);
+  --empty:#f3eafc;
+  --f-ui:"Fredoka","Trebuchet MS","Segoe UI",sans-serif;
+  --f-abc:"Andika","Century Gothic","Trebuchet MS",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --sky1:#2b1650; --sky2:#1f1546; --sky3:#12224a;
+  --card:#3a2866; --ink:#fdeeff; --ink-soft:#cdb6ea;
+  --pink:#ff7ab4; --pink-deep:#ff9cc8;
+  --shadow:rgba(0,0,0,.55); --line:rgba(255,255,255,.18);
+  --empty:#2c1d52; color-scheme:dark } }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{
+  margin:0; overflow:hidden; color:var(--ink); font-family:var(--f-ui); font-size:18px;
+  background:linear-gradient(160deg,var(--sky1),var(--sky2) 50%,var(--sky3));
+  padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));
+  -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; touch-action:manipulation;
+}
+button{font:inherit; color:inherit; cursor:pointer; border:0}
+input{user-select:text; -webkit-user-select:text}
+a{color:inherit}
+button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible{outline:4px solid var(--r5); outline-offset:3px}
+
+.rainbow{position:fixed; left:50%; bottom:-62vmin; width:130vmin; height:130vmin; transform:translateX(-50%); border-radius:50%; opacity:.4; pointer-events:none;
+  background:radial-gradient(circle closest-side, transparent 0 76%, var(--r6) 76% 80%, var(--r5) 80% 84%, var(--r4) 84% 88%, var(--r3) 88% 92%, var(--r2) 92% 96%, var(--r1) 96% 100%)}
+.cloud{position:fixed; width:150px; height:46px; border-radius:40px; background:var(--card); opacity:.55; pointer-events:none; animation:drift 60s linear infinite}
+.cloud::before,.cloud::after{content:""; position:absolute; background:var(--card); border-radius:50%}
+.cloud::before{width:64px; height:64px; left:22px; top:-30px}
+.cloud::after{width:48px; height:48px; right:26px; top:-20px}
+.cloud.c1{top:8%; left:-10%} .cloud.c2{top:30%; left:-30%; animation-duration:85s; animation-delay:-40s; transform:scale(.7)}
+@keyframes drift{to{left:110%}}
+
+.screen{display:none; position:relative; height:100%; flex-direction:column; gap:10px; overflow-y:auto; overflow-x:hidden}
+.screen.on{display:flex}
+
+/* --- shared --- */
+.bubble{background:var(--card); border-radius:26px; padding:10px 18px; box-shadow:0 5px 0 var(--line); font-weight:600; font-size:clamp(17px,2.6vh,26px); line-height:1.25; min-width:0; flex:1; display:flex; align-items:center; gap:12px}
+.bubble .who{font-size:1.9em; line-height:1; animation:bob 2.4s ease-in-out infinite}
+.bubble .say{min-width:0}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-6deg)}}
+.round{width:58px; height:58px; flex:none; border-radius:50%; background:var(--card); box-shadow:0 5px 0 var(--line); font-size:28px; display:grid; place-items:center}
+.round:active,.big:active,.game:active,.key:active,.choice:active{transform:translateY(4px); box-shadow:none}
+.stars{flex:none; background:var(--r3); color:var(--on-color); border-radius:30px; padding:8px 16px; font-weight:700; font-size:22px; box-shadow:0 5px 0 var(--line); font-variant-numeric:tabular-nums}
+.big{background:var(--pink); color:#fff; font-weight:700; font-size:clamp(22px,4vh,34px); padding:.55em 1.3em; border-radius:999px; box-shadow:0 7px 0 var(--line)}
+.big.alt{background:var(--card); color:var(--ink)}
+h1{font-size:clamp(38px,9vh,84px); margin:0; line-height:1; color:var(--pink-deep); text-wrap:balance; letter-spacing:.01em}
+.seg{display:inline-flex; background:var(--card); border-radius:999px; padding:5px; box-shadow:0 5px 0 var(--line); gap:4px}
+.seg button{background:transparent; border-radius:999px; padding:8px 18px; font-weight:700; font-size:22px; min-width:74px}
+.seg button[aria-pressed="true"]{background:var(--r6); color:var(--on-color)}
+.row{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; align-items:center}
+
+/* --- start --- */
+.startbox{margin:auto; display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; width:100%; max-width:680px; padding:8px 0 20px}
+.hero{font-size:clamp(70px,16vh,150px); line-height:1; animation:bob 2.4s ease-in-out infinite}
+#start h1{font-size:clamp(34px,7vh,68px)}
+.tagline{margin:0; font-size:clamp(17px,2.6vh,22px); color:var(--ink-soft); font-weight:600}
+.namebox{display:flex; flex-direction:column; gap:8px; align-items:center; width:100%}
+.namebox label{font-weight:700; font-size:22px}
+#name{font:inherit; font-size:28px; font-weight:600; text-align:center; width:min(100%,380px); padding:10px 18px; border-radius:999px; border:4px solid var(--r6); background:var(--card); color:var(--ink)}
+#name::placeholder{color:var(--ink-soft); opacity:.7; font-weight:400}
+.about{background:var(--card); border-radius:26px; padding:16px 22px; box-shadow:0 5px 0 var(--line); text-align:left; font-size:16px; line-height:1.5; margin-top:10px}
+.about h2{margin:0 0 4px; font-size:20px}
+.about p{margin:0 0 8px}
+.about ul{margin:0 0 8px; padding:0; list-style:none; display:grid; gap:2px}
+.about .tip{color:var(--ink-soft); font-size:15px; margin:0}
+.back{font-size:15px; color:var(--ink-soft); text-decoration:none; font-weight:600}
+.back:hover{text-decoration:underline}
+
+/* --- win --- */
+#win{align-items:center; justify-content:center; text-align:center; gap:2vh}
+#win .bubble{flex:none; max-width:720px}
+#prize{font-size:clamp(100px,28vh,240px); line-height:1; animation:pop .9s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pop{from{transform:scale(0) rotate(-40deg)}}
+
+/* --- home --- */
+.top{display:flex; gap:12px; align-items:center; flex:none}
+#home h1{font-size:clamp(28px,6vh,56px); flex:1; min-width:0; overflow-wrap:anywhere}
+.games{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; flex:1; min-height:150px; max-height:300px}
+.game{border-radius:30px; padding:12px 10px; color:var(--on-color); font-weight:700; font-size:clamp(19px,2.9vh,26px); box-shadow:0 7px 0 var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; position:relative; line-height:1.1}
+.game .em{font-size:clamp(44px,9vh,80px); line-height:1.1}
+.game small{font-weight:400; font-size:.68em}
+.game .num{position:absolute; top:10px; left:12px; width:30px; height:30px; border-radius:50%; background:var(--card); color:var(--ink); font-size:17px; display:grid; place-items:center}
+.homebar{display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:space-between; flex:none}
+#caseSeg button{font-family:var(--f-abc)}
+.shelf{background:var(--card); border-radius:26px; padding:10px 16px; box-shadow:0 5px 0 var(--line); flex:none}
+.shelf b{display:block; font-size:17px; margin-bottom:2px}
+#stickers{font-size:clamp(26px,4.5vh,38px); line-height:1.25; letter-spacing:.08em; min-height:1.3em; overflow-wrap:anywhere}
+#stickers.none{font-size:16px; color:var(--ink-soft); letter-spacing:0}
+.walker{position:absolute; bottom:2px; left:-60px; font-size:34px; animation:walk 26s linear infinite; pointer-events:none}
+@keyframes walk{to{left:105%}}
+
+/* --- game --- */
+.stage{flex:1; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2vh}
+#card{background:var(--card); border-radius:40px; box-shadow:0 10px 0 var(--line), 0 18px 40px var(--shadow); padding:.02em .32em .08em; min-width:1.7em; text-align:center;
+  font-family:var(--f-abc); font-weight:700; font-size:clamp(84px,27vh,250px); line-height:1.15; color:var(--pink-deep); white-space:nowrap}
+#card.compact{font-size:clamp(60px,15vh,130px)}
+#card.yay{animation:yay .5s}
+#card.no{animation:no .4s}
+@keyframes yay{40%{transform:scale(1.14) rotate(3deg)}}
+@keyframes no{25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+#card .pic{display:block; font-size:.5em; line-height:1.2}
+.slots{display:flex; gap:.12em; justify-content:center; font-size:min(11vh,calc(84vw / var(--n) / 1.25)); padding:.15em 0 .2em}
+.slot{width:1.1em; height:1.35em; border-radius:.22em; background:var(--empty); color:var(--ink-soft); display:grid; place-items:center; line-height:1; opacity:.75}
+.slot.done{background:var(--r4); color:var(--on-color); opacity:1}
+.slot.now{outline:.07em solid var(--pink); opacity:1; animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.09)}}
+#choices{display:flex; gap:2.2vw; flex-wrap:wrap; justify-content:center}
+.choice{font-family:var(--f-abc); font-weight:700; font-size:clamp(50px,15vh,130px); line-height:1.2; width:1.55em; border-radius:.26em; color:var(--on-color); box-shadow:0 8px 0 var(--line)}
+.choice.hint,.key.hint{animation:pulse .7s infinite; outline:5px solid var(--pink); position:relative; z-index:1}
+
+#progress{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:none; padding-top:20px}
+.dot{width:clamp(24px,2.7vw,40px); height:clamp(24px,2.7vw,40px); border-radius:50%; background:var(--empty); color:var(--ink-soft); font-family:var(--f-abc); font-weight:700; font-size:clamp(13px,1.5vw,21px); display:grid; place-items:center; position:relative}
+.dot.done{color:var(--on-color)}
+.dot.now{outline:3px solid var(--pink)}
+.dot.now::after{content:"🐞"; position:absolute; top:-1.15em; left:50%; transform:translateX(-50%); font-size:1.15em; animation:bob 1s infinite}
+.pip{width:clamp(34px,6vh,52px); height:clamp(34px,6vh,52px); border-radius:50%; border:3px dashed var(--line); display:grid; place-items:center; font-size:clamp(22px,4.2vh,36px); line-height:1}
+.pip.done{border-color:transparent; animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+
+#kb{flex:none; display:flex; flex-direction:column; gap:.7vh; align-items:center; --k:min(7.4vw,8.2vh,72px); padding-bottom:4px}
+#kb .kr{display:flex; gap:.5vw}
+#kb .kr:nth-child(2){margin-left:calc(var(--k) * .35)}
+.key{width:var(--k); height:var(--k); border-radius:calc(var(--k) * .26); background:var(--card); box-shadow:0 4px 0 var(--line); font-family:var(--f-abc); font-weight:700; font-size:calc(var(--k) * .54); line-height:1; padding:0}
+
+#fx{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:50}
+#fx span{position:absolute; font-size:34px; will-change:transform}
+
+/* --- settings --- */
+dialog{border:0; border-radius:30px; background:var(--card); color:var(--ink); padding:22px; width:min(520px,calc(100vw - 32px)); max-height:calc(100% - 32px); box-shadow:0 20px 60px var(--shadow); font-family:var(--f-ui)}
+dialog::backdrop{background:rgba(40,15,70,.55)}
+dialog h2{margin:0 0 12px; font-size:26px}
+.opt{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 0; border-top:2px solid var(--line); flex-wrap:wrap}
+.opt label{font-weight:600}
+.opt select{font:inherit; padding:6px 10px; border-radius:12px; max-width:240px; background:var(--empty); color:var(--ink); border:2px solid var(--line)}
+.opt input[type=checkbox]{width:28px; height:28px; accent-color:var(--pink)}
+.opt input[type=range]{width:180px; accent-color:var(--pink)}
+.pill{background:var(--empty); border-radius:999px; padding:8px 16px; font-weight:600; font-size:16px}
+.note{color:var(--ink-soft); font-size:15px; margin:6px 0 0}
+dialog .seg{box-shadow:none; background:var(--empty)}
+dialog .seg button{font-size:18px; padding:6px 14px}
+
+@media (max-width:560px){ .cloud{display:none} .stars{font-size:18px; padding:6px 10px} .round{width:48px; height:48px; font-size:23px} .games{max-height:none} .bubble .who{display:none} }
+@media (prefers-reduced-motion: reduce){ .cloud,.walker,.hero,.bubble .who{animation:none} }
+</style>
+</head>
+<body>
+
+<div class="rainbow"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+
+<section class="screen on" id="start">
+  <div class="startbox">
+    <div class="hero">🦄</div>
+    <h1 id="gameTitle">Letter Adventure</h1>
+    <p class="tagline" data-t="tagline"></p>
+    <div class="seg" id="langSeg" role="group" aria-label="Språk / Language">
+      <button data-lang="sv">Svenska</button><button data-lang="en">English</button>
+    </div>
+    <div class="namebox">
+      <label for="name" data-t="nameLabel"></label>
+      <input id="name" type="text" maxlength="16" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go">
+    </div>
+    <button class="big" id="go" data-t="start"></button>
+    <div class="about">
+      <h2 data-t="aboutH"></h2>
+      <p data-t="about"></p>
+      <ul id="aboutList"></ul>
+      <p class="tip" data-t="tip"></p>
+    </div>
+    <a class="back" href="/#projects">← sverrhag.com</a>
+  </div>
+</section>
+
+<section class="screen" id="home">
+  <div class="top">
+    <h1 id="homeTitle"></h1>
+    <span class="stars">⭐ <span class="starcount">0</span></span>
+    <button class="round" id="openSettings" data-ta="setH">⚙️</button>
+  </div>
+  <div class="top"><div class="bubble"><span class="who">🦄</span><span class="say"></span></div></div>
+  <div class="games" id="games"></div>
+  <div class="homebar">
+    <div class="seg" id="caseSeg" role="group" data-ta="setLetters">
+      <button data-case="upper">ABC</button><button data-case="lower">abc</button><button data-case="both">Aa</button>
+    </div>
+  </div>
+  <div class="shelf"><b id="shelfTitle"></b><div id="stickers"></div></div>
+  <span class="walker">🐞</span>
+</section>
+
+<section class="screen" id="game">
+  <div class="top">
+    <button class="round" id="toHome" data-ta="ariaHome">🏠</button>
+    <div class="bubble"><span class="who" id="guide">🦄</span><span class="say"></span></div>
+    <button class="round" id="again" data-ta="ariaAgain">🔊</button>
+    <span class="stars">⭐ <span class="starcount">0</span></span>
+  </div>
+  <div class="stage"><div id="card"></div><div id="choices"></div></div>
+  <div id="progress"></div>
+  <div id="kb"></div>
+</section>
+
+<section class="screen" id="win">
+  <div id="prize">🦄</div>
+  <h1 id="winTitle"></h1>
+  <div class="bubble"><span class="who">🐞</span><span class="say"></span></div>
+  <div class="row"><button class="big" id="replay" data-t="replay"></button><button class="big alt" id="winHome" data-t="winHome"></button></div>
+</section>
+
+<div id="fx"></div>
+
+<dialog id="settings">
+  <h2 data-t="setH"></h2>
+  <div class="opt"><label data-t="setLetters"></label>
+    <div class="seg" role="group">
+      <button data-case="upper" data-t="caseU"></button><button data-case="lower" data-t="caseL"></button><button data-case="both" data-t="caseB"></button>
+    </div></div>
+  <div class="opt"><label for="optVoice" data-t="setVoice"></label><input type="checkbox" id="optVoice"></div>
+  <div class="opt"><label for="optVoiceName" data-t="setVoiceName"></label><select id="optVoiceName"></select></div>
+  <div class="opt"><label for="optRate" data-t="setRate"></label><input type="range" id="optRate" min="0.6" max="1.2" step="0.05"></div>
+  <div class="opt"><span></span><button class="pill" id="testVoice" data-t="setTest"></button></div>
+  <p class="note" id="voiceNote" data-t="voiceNote" hidden></p>
+  <div class="opt"><label for="optSfx" data-t="setSfx"></label><input type="checkbox" id="optSfx"></div>
+  <div class="opt"><label for="optKb" data-t="setKb"></label><input type="checkbox" id="optKb"></div>
+  <div class="opt"><button class="pill" id="fullscreen" data-t="setFull"></button><button class="pill" id="reset" data-t="setReset"></button></div>
+  <div class="opt"><button class="pill" id="changeName" data-t="setChange"></button><button class="big" id="closeSettings" style="font-size:20px" data-t="setDone"></button></div>
+</dialog>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const COLORS = ['--r1','--r2','--r3','--r4','--r5','--r6'];
+const GAME_META = [
+  {id:'alfabet', em:'🌈', c:'--r1', guide:'🦄'},
+  {id:'hitta',   em:'🐞', c:'--r2', guide:'🐞'},
+  {id:'lyssna',  em:'👂', c:'--r3', guide:'🦄'},
+  {id:'para',    em:'🦋', c:'--r4', guide:'🐞'},
+  {id:'ord',     em:'🦄', c:'--r6', guide:'🦄'},
+];
+const STICKERS = [...'🦄🐞🌈⭐🌸🦋🍓🧁👑💖🐱🐶🍭🎀🌟🐰🍉🎈🐥🌻'];
+
+/* ---------- languages ---------- */
+const LANGS = {
+sv: {
+  code:'sv-SE', alpha:'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ', kb:['QWERTYUIOPÅ','ASDFGHJKLÖÄ','ZXCVBNM'],
+  title:'Bokstavsäventyret', friend:'kompis',
+  poss: n => n + (/[sxz]$/i.test(n) ? '' : 's'),
+  homeTitle: p => `${p} bokstäver`, shelfTitle: p => `${p} klistermärken`, winTitle: 'Hurra, {n}!',
+  ui: {
+    tagline:'Lär dig bokstäverna med enhörningen och nyckelpigan',
+    nameLabel:'Vad heter du?', namePh:'Skriv ditt namn', start:'Börja spela 🐞',
+    aboutH:'Om spelet',
+    about:'Ett bokstavsspel för barn från ungefär fyra år. Barnet övar på att känna igen och skriva bokstäver, med tangentbord eller pekskärm, i fem små spel. En glad röst guidar, berömmer varje rätt svar och hjälper vänligt till när det blir fel. Välj stora bokstäver, små bokstäver eller båda.',
+    tip:'Fungerar bäst i Chrome på surfplatta eller dator. Rösten använder enhetens egen talsyntes. Inget konto och ingen reklam – stjärnor och klistermärken sparas bara i den här webbläsaren.',
+    noStickers:'Här hamnar dina klistermärken när du har spelat klart ett spel.',
+    replay:'Spela igen', winHome:'🏠 Hem', ariaHome:'Hem', ariaAgain:'Lyssna igen',
+    setH:'Inställningar för vuxna', setLetters:'Bokstäver', caseU:'STORA', caseL:'små', caseB:'Båda',
+    setVoice:'Röst som guidar', setVoiceName:'Välj röst', setRate:'Röstens tempo', setTest:'🔊 Testa rösten',
+    voiceNote:'Ingen svensk röst hittades i webbläsaren. Ladda ner svenska under enhetens inställningar för text-till-tal.',
+    deviceVoice:'Enhetens svenska röst',
+    setSfx:'Ljudeffekter', setKb:'Tangentbord på skärmen', setFull:'⛶ Helskärm',
+    setReset:'Nollställ stjärnor', setResetArm:'Tryck igen för att nollställa', setResetDone:'Nollställt!',
+    setChange:'Byt namn eller språk', setDone:'Klar',
+  },
+  games: [['Alfabetet','A till Ö i rätt ordning'],['Hitta bokstaven','Tryck på rätt tangent'],['Lyssna','Vilken bokstav hör du?'],['Stor och liten','Vilka hör ihop?'],['Skriv ord','Bokstav för bokstav']],
+  words: [['SOL','☀️'],['KO','🐮'],['BIL','🚗'],['BOK','📖'],['HUS','🏠'],['KATT','🐱'],['HUND','🐶'],['FISK','🐟'],['BÅT','⛵'],['MÅNE','🌙'],['ORM','🐍'],['GRIS','🐷'],['HÄST','🐴'],['TÅG','🚂'],['BOLL','⚽'],['ÄPPLE','🍎'],['GLASS','🍦'],['BLOMMA','🌸'],['MAMMA','👩'],['PAPPA','👨'],['ÖRA','👂'],['ÄGG','🥚'],['RÄV','🦊'],['BJÖRN','🐻'],['MUS','🐭'],['KAKA','🍪'],['HJÄRTA','💖'],['FJÄRIL','🦋'],['KRONA','👑'],['TÅRTA','🎂']],
+  finale: [['ENHÖRNING','🦄'],['NYCKELPIGA','🐞'],['REGNBÅGE','🌈']],
+  short: ['Bra!','Ja!','Rätt!','Snyggt!','Toppen!','Precis!','Härligt!','Wow!','Super!','Jättebra!'],
+  long: ['Bra jobbat, {n}!','Superbra, {n}!','Du är en stjärna!','Wow, helt rätt!','Heja {n}!','Fantastiskt!','Jättebra, {n}!','Vad duktig du är!','Enhörningen dansar av glädje!','Nyckelpigan är så stolt över dig!','Du är en bokstavsmästare!','Perfekt, {n}!','Strålande!','Vilken stjärna du är!','Magiskt bra!','Regnbågsbra, {n}!','Nyckelpigan gör en glädjevolt!','Enhörningen jublar!'],
+  greet:'Hej {n}! Välkommen till Bokstavsäventyret! Vad vill du spela?',
+  homeAgain: ['Vad vill du spela nu, {n}?','Välj ett spel, {n}!','Vilket spel blir det nu?'],
+  caseSay: {upper:'Nu övar vi på stora bokstäver!', lower:'Nu övar vi på små bokstäver!', both:'Nu övar vi på både stora och små bokstäver!'},
+  intro: {alfabet:'Nu skriver vi hela alfabetet, {n}!', hitta:'Nu letar vi bokstäver på tangentbordet!', lyssna:'Lyssna noga, {n}!', para:'Nu parar vi ihop stora och små bokstäver!', ord:'Nu skriver vi ord!'},
+  alphaFirst: L => `Börja med ${L}.`, alphaLast: L => `Och sist kommer ${L}!`, alphaNext: ['Nu kommer ','Sen kommer ','Hitta ','Och så '],
+  letter:'bokstaven ', big:'stora ', small:'lilla ',
+  find: n => [`Hitta ${n}!`,`Var är ${n}?`,`Kan du trycka på ${n}?`],
+  listen: n => [`Vilken är ${n}?`,`Tryck på ${n}!`],
+  pairUp: L => `Vilken liten bokstav hör ihop med stora ${L}?`, pairLow: L => `Vilken stor bokstav hör ihop med lilla ${L}?`,
+  wordNext: L => `Nu ${L}.`, wordStart: (w,L) => `Skriv ordet ${w}. Börja med ${L}.`, nameStart: L => `Skriv ditt namn, {n}! Börja med ${L}.`,
+  wrong: (k,n) => [`Oj, det där var ${k}. Leta efter ${n}!`,`Nästan! Försök igen. Vi letar efter ${n}.`,`Hoppsan, det var ${k}. Kan du hitta ${n}?`],
+  wroteName:'Du skrev ditt namn! ', wrote: w => `Du skrev ${w}! `,
+  win: {alfabet:'Du skrev hela alfabetet, från A till Ö! Du är en riktig bokstavsmästare!', hitta:'Du hittade alla bokstäverna! Nyckelpigan är jättestolt!', lyssna:'Vilka fina öron du har! Du klarade alla!', para:'Du parade ihop allihop! Enhörningen dansar av glädje!', ord:'Du skrev alla orden helt själv! Fantastiskt!'},
+  winSay: m => `Hurra, {n}! ${m} Du får ett nytt klistermärke och fem stjärnor!`,
+  test:'Hej {n}! Nu ska vi leka med bokstäver. A, B, C, Å, Ä, Ö!',
+},
+en: {
+  code:'en-US', alpha:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', kb:['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'],
+  title:'Letter Adventure', friend:'friend',
+  poss: n => n + (/s$/i.test(n) ? '’' : '’s'),
+  homeTitle: p => `${p} letters`, shelfTitle: p => `${p} stickers`, winTitle: 'Hooray, {n}!',
+  ui: {
+    tagline:'Learn your letters with the unicorn and the ladybug',
+    nameLabel:'What is your name?', namePh:'Type your name', start:'Start playing 🐞',
+    aboutH:'About the game',
+    about:'A letter game for children from about age four. Your child practises recognising and typing letters, with a keyboard or a touch screen, in five small games. A cheerful voice guides the way, praises every right answer and gently helps after a mistake. Choose big letters, small letters or both.',
+    tip:'Works best in Chrome on a tablet or computer. The voice uses your device’s own text-to-speech. No account and no ads. Stars and stickers are saved only in this browser.',
+    noStickers:'Your stickers will appear here when you finish a game.',
+    replay:'Play again', winHome:'🏠 Home', ariaHome:'Home', ariaAgain:'Listen again',
+    setH:'Settings for grown-ups', setLetters:'Letters', caseU:'BIG', caseL:'small', caseB:'Both',
+    setVoice:'Voice guide', setVoiceName:'Choose voice', setRate:'Voice speed', setTest:'🔊 Test the voice',
+    voiceNote:'No English voice was found in this browser. Download English in your device’s text-to-speech settings.',
+    deviceVoice:'Device’s English voice',
+    setSfx:'Sound effects', setKb:'On-screen keyboard', setFull:'⛶ Full screen',
+    setReset:'Reset stars', setResetArm:'Tap again to reset', setResetDone:'Reset!',
+    setChange:'Change name or language', setDone:'Done',
+  },
+  games: [['The alphabet','A to Z in the right order'],['Find the letter','Press the right key'],['Listen','Which letter do you hear?'],['Big and small','Which ones match?'],['Spell words','Letter by letter']],
+  words: [['SUN','☀️'],['COW','🐮'],['CAR','🚗'],['BOOK','📖'],['CAT','🐱'],['DOG','🐶'],['FISH','🐟'],['BOAT','⛵'],['MOON','🌙'],['PIG','🐷'],['BALL','⚽'],['EGG','🥚'],['FOX','🦊'],['BEAR','🐻'],['STAR','⭐'],['CAKE','🎂'],['BEE','🐝'],['FROG','🐸'],['DUCK','🦆'],['TREE','🌳'],['APPLE','🍎'],['HORSE','🐴'],['MOUSE','🐭'],['HEART','💖'],['TRAIN','🚂'],['CROWN','👑'],['HOUSE','🏠'],['FLOWER','🌸'],['COOKIE','🍪'],['SNAKE','🐍']],
+  finale: [['UNICORN','🦄'],['LADYBUG','🐞'],['RAINBOW','🌈']],
+  short: ['Great!','Yes!','Right!','Nice!','Super!','Exactly!','Lovely!','Wow!','Awesome!','Well done!'],
+  long: ['Great job, {n}!','Super, {n}!','You are a star!','Wow, exactly right!','Go {n}!','Fantastic!','Well done, {n}!','How clever you are!','The unicorn is dancing with joy!','The ladybug is so proud of you!','You are a letter champion!','Perfect, {n}!','Brilliant!','What a star you are!','Magically good!','Rainbow-tastic, {n}!','The ladybug does a happy flip!','The unicorn is cheering!'],
+  greet:'Hi {n}! Welcome to Letter Adventure! What would you like to play?',
+  homeAgain: ['What would you like to play now, {n}?','Pick a game, {n}!','Which game is next?'],
+  caseSay: {upper:'Now we practise big letters!', lower:'Now we practise small letters!', both:'Now we practise both big and small letters!'},
+  intro: {alfabet:'Let’s type the whole alphabet, {n}!', hitta:'Let’s find letters on the keyboard!', lyssna:'Listen carefully, {n}!', para:'Let’s match big and small letters!', ord:'Let’s spell some words!'},
+  alphaFirst: L => `Start with ${L}.`, alphaLast: L => `And last comes ${L}!`, alphaNext: ['Now comes ','Next is ','Find ','And then '],
+  letter:'the letter ', big:'big ', small:'small ',
+  find: n => [`Find ${n}!`,`Where is ${n}?`,`Can you press ${n}?`],
+  listen: n => [`Which one is ${n}?`,`Tap ${n}!`],
+  pairUp: L => `Which small letter goes with big ${L}?`, pairLow: L => `Which big letter goes with small ${L}?`,
+  wordNext: L => `Now ${L}.`, wordStart: (w,L) => `Spell the word ${w}. Start with ${L}.`, nameStart: L => `Spell your name, {n}! Start with ${L}.`,
+  wrong: (k,n) => [`Oops, that was ${k}. Look for ${n}!`,`Almost! Try again. We are looking for ${n}.`,`Whoops, that was ${k}. Can you find ${n}?`],
+  wroteName:'You spelled your name! ', wrote: w => `You spelled ${w}! `,
+  win: {alfabet:'You typed the whole alphabet, from A to Z! You are a real letter champion!', hitta:'You found all the letters! The ladybug is so proud!', lyssna:'What great ears you have! You got them all!', para:'You matched every one! The unicorn is dancing with joy!', ord:'You spelled all the words by yourself! Fantastic!'},
+  winSay: m => `Hooray, {n}! ${m} You get a new sticker and five stars!`,
+  test:'Hi {n}! Let’s play with letters. A, B, C, X, Y, Z!',
+}};
+
+/* ---------- state ---------- */
+const KEY = 'letter-adventure-v1';
+const S = {name:'', lang:(navigator.language||'').toLowerCase().startsWith('sv') ? 'sv' : 'en', letterCase:'upper', voice:true, voiceNames:{}, rate:0.9, sfx:true, kb:true, stars:0, stickers:[]};
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch {}
+if (!LANGS[S.lang]) S.lang = 'en';
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+let T = LANGS[S.lang], ALPHA = [...T.alpha];
+
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a = [...a]; for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const disp = (L,c) => c==='lower' ? L.toLowerCase() : L;
+const pickCase = () => S.letterCase==='both' ? (Math.random()<.5?'upper':'lower') : S.letterCase;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const nm = () => S.name || T.friend;
+const fmt = s => s.replaceAll('{n}', nm());
+const praise = () => fmt(pick(T.long));
+
+/* ---------- voice ---------- */
+const synth = window.speechSynthesis;
+let voices = [], tok = 0, curU = null;
+const vlang = v => (v.lang||'').replace('_','-').toLowerCase();
+function loadVoices(){
+  if (!synth) return;
+  const all = synth.getVoices() || [];
+  voices = all.filter(v => vlang(v).startsWith(S.lang));
+  const exact = voices.filter(v => vlang(v) === T.code.toLowerCase());
+  voices = [...exact, ...voices.filter(v => !exact.includes(v))];
+  const sel = $('#optVoiceName'); sel.innerHTML = '';
+  if (!voices.length) sel.add(new Option(T.ui.deviceVoice, ''));
+  voices.forEach(v => sel.add(new Option(v.name.replace(/Microsoft |Google /,''), v.name)));
+  const saved = S.voiceNames[S.lang];
+  sel.value = voices.some(v=>v.name===saved) ? saved : (voices[0]?.name || '');
+  $('#voiceNote').hidden = voices.length > 0 || !all.length;
+}
+if (synth) synth.addEventListener?.('voiceschanged', loadVoices);
+
+function say(text, then){
+  $$('.say').forEach(e => e.textContent = text);
+  const my = ++tok; let done = false, tm;
+  const fin = () => { if (done) return; done = true; clearTimeout(tm); if (then && my===tok) then(); };
+  if (!S.voice || !synth){ if (then) tm = setTimeout(fin, 1300); return; }
+  try { synth.cancel(); } catch {}
+  tm = setTimeout(fin, 1800 + text.length*95);
+  setTimeout(() => {
+    if (my !== tok) return;
+    try {
+      const u = curU = new SpeechSynthesisUtterance(text);
+      u.lang = T.code;
+      const v = voices.find(v=>v.name===S.voiceNames[S.lang]) || voices[0]; if (v) u.voice = v;
+      u.rate = S.rate; u.pitch = 1.2;
+      u.onend = u.onerror = fin;
+      synth.speak(u);
+    } catch { fin(); }
+  }, 60);
+}
+
+/* ---------- sound ---------- */
+let ac = null;
+function tone(f, at, dur, type='sine', vol=.16){
+  if (!S.sfx || !ac) return;
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + at;
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t+.02); g.gain.exponentialRampToValueAtTime(.001, t+dur);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t+dur+.05);
+}
+const sfxYes = () => [523,659,784,1047].forEach((f,i)=>tone(f,i*.07,.22,'triangle'));
+const sfxNo  = () => { tone(300,0,.18,'sine',.12); tone(240,.12,.22,'sine',.12); };
+const sfxWin = () => [523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,i*.13,.3,'triangle'));
+
+/* ---------- sparkle ---------- */
+function burst(n, el){
+  if (reduced) n = Math.ceil(n/4);
+  const r = el ? el.getBoundingClientRect() : {left:innerWidth/2, top:innerHeight/2, width:0, height:0};
+  const x = r.left + r.width/2, y = r.top + r.height/2;
+  for (let i=0;i<n;i++){
+    const s = document.createElement('span'); s.textContent = pick(['⭐','💖','🦄','🐞','🌸','✨','🌈']);
+    s.style.left = x+'px'; s.style.top = y+'px'; $('#fx').append(s);
+    const a = Math.random()*Math.PI*2, d = 140 + Math.random()*260;
+    s.animate([{transform:'translate(-50%,-50%) scale(.3)', opacity:1},
+               {transform:`translate(calc(-50% + ${Math.cos(a)*d}px), calc(-50% + ${Math.sin(a)*d - 60}px)) scale(1.3) rotate(${Math.random()*360}deg)`, opacity:0}],
+              {duration:900+Math.random()*700, easing:'cubic-bezier(.1,.7,.3,1)'}).onfinish = () => s.remove();
+  }
+}
+function rain(n){
+  if (reduced) n = Math.ceil(n/5);
+  for (let i=0;i<n;i++){
+    const s = document.createElement('span'); s.textContent = pick(['⭐','💖','🦄','🐞','🌸','🎀','🌈','🎈']);
+    s.style.left = Math.random()*100+'%'; s.style.top = '-50px'; $('#fx').append(s);
+    s.animate([{transform:'translateY(0) rotate(0)'},{transform:`translateY(${innerHeight+120}px) rotate(${Math.random()*720-360}deg)`}],
+              {duration:2200+Math.random()*2600, delay:Math.random()*1800, easing:'linear'}).onfinish = () => s.remove();
+  }
+}
+
+/* ---------- screens ---------- */
+let screen = 'start', G = null, lastId = 'alfabet';
+function show(id){
+  screen = id; $$('.screen').forEach(s => s.classList.toggle('on', s.id===id));
+  document.activeElement?.blur?.();
+}
+function applyLang(){
+  T = LANGS[S.lang]; ALPHA = [...T.alpha];
+  document.documentElement.lang = S.lang; document.title = T.title;
+  $('#gameTitle').textContent = T.title;
+  $$('[data-t]').forEach(e => e.textContent = T.ui[e.dataset.t]);
+  $$('[data-ta]').forEach(e => e.setAttribute('aria-label', T.ui[e.dataset.ta]));
+  $('#name').placeholder = T.ui.namePh;
+  $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang===S.lang));
+  $('#games').innerHTML = GAME_META.map((g,i)=>`<button class="game" data-g="${g.id}" style="background:var(${g.c})"><span class="num">${i+1}</span><span class="em">${g.em}</span>${T.games[i][0]}<small>${T.games[i][1]}</small></button>`).join('');
+  $('#aboutList').innerHTML = GAME_META.map((g,i)=>`<li>${g.em} <b>${T.games[i][0]}</b> – ${T.games[i][1]}</li>`).join('');
+  loadVoices(); refresh();
+}
+function refresh(){
+  const p = T.poss(nm());
+  $('#homeTitle').textContent = T.homeTitle(p);
+  $('#shelfTitle').textContent = T.shelfTitle(p);
+  $('#winTitle').textContent = fmt(T.winTitle);
+  $$('.starcount').forEach(e => e.textContent = S.stars);
+  $$('[data-case]').forEach(b => b.setAttribute('aria-pressed', b.dataset.case===S.letterCase));
+  const st = $('#stickers');
+  st.classList.toggle('none', !S.stickers.length);
+  st.textContent = S.stickers.length ? S.stickers.slice(-45).join('') : T.ui.noStickers;
+  $('#optVoice').checked = S.voice; $('#optSfx').checked = S.sfx; $('#optKb').checked = S.kb; $('#optRate').value = S.rate;
+  buildKb();
+}
+function goHome(greet){
+  G = null; show('home'); refresh();
+  say(fmt(greet || pick(T.homeAgain)));
+}
+function begin(){
+  S.name = $('#name').value.trim().replace(/\s+/g,' ').slice(0,16); save();
+  try { ac = ac || new (window.AudioContext||window.webkitAudioContext)(); ac.resume?.(); } catch {}
+  goHome(T.greet);
+}
+
+$('#games').addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) startGame(b.dataset.g); });
+
+function buildKb(){
+  const kb = $('#kb');
+  const choiceGame = G && (G.id==='lyssna' || G.id==='para');
+  kb.hidden = !S.kb || choiceGame;
+  const c = S.letterCase==='lower' ? 'lower' : 'upper';
+  kb.innerHTML = T.kb.map(r => `<div class="kr">${[...r].map(L=>`<button class="key" data-k="${L}">${disp(L,c)}</button>`).join('')}</div>`).join('');
+}
+$('#kb').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
+$('#choices').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
+
+/* ---------- games ---------- */
+function nameWord(){
+  const w = S.name.toLocaleUpperCase(S.lang);
+  return w.length>=2 && w.length<=10 && [...w].every(ch => ALPHA.includes(ch)) ? w : null;
+}
+function startGame(id){
+  lastId = id;
+  const g = GAME_META.find(g=>g.id===id);
+  G = {id, i:0, pos:0, wrong:0, lock:false};
+  if (id==='alfabet') G.items = ALPHA.map(L=>({L}));
+  else if (id==='ord'){
+    const pool = shuffle(T.words), me = nameWord();
+    const ws = [...(me ? [[me,'💖',true]] : []), ...pool.filter(w=>w[0].length<=4).slice(0, me ? 3 : 4), pool.find(w=>w[0].length>=5), pick(T.finale)];
+    G.items = ws.map(([w,e,isName])=>({w,e,isName,c:pickCase()}));
+  } else G.items = shuffle(ALPHA).slice(0,10).map(L=>({L,c:pickCase()}));
+  $('#guide').textContent = g.guide;
+  show('game'); buildKb(); render();
+  say(fmt(T.intro[id]) + ' ' + prompt());
+}
+const item = () => G.items[G.i];
+const target = () => G.id==='ord' ? item().w[G.pos] : item().L;
+function nameOf(L,c){ return S.letterCase==='both' && c ? (c==='lower' ? T.small : T.big) + L : T.letter + L; }
+
+function prompt(){
+  const it = item(), L = target();
+  switch (G.id){
+    case 'alfabet':
+      if (G.i===0) return T.alphaFirst(L);
+      if (G.i===ALPHA.length-1) return T.alphaLast(L);
+      return pick(T.alphaNext) + L + '.';
+    case 'hitta': return pick(T.find(nameOf(L,it.c)));
+    case 'lyssna': return pick(T.listen(nameOf(L,it.c)));
+    case 'para': return it.c==='upper' ? T.pairUp(L) : T.pairLow(L);
+    case 'ord':
+      if (G.pos>0) return T.wordNext(L);
+      return it.isName ? fmt(T.nameStart(L)) : T.wordStart(it.w.toLowerCase(), L);
+  }
+}
+
+function render(){
+  const it = item(), card = $('#card'), ch = $('#choices'), id = G.id;
+  G.wrong = 0;
+  card.className = ''; ch.innerHTML = ''; ch.hidden = true;
+  $$('.hint').forEach(e=>e.classList.remove('hint'));
+  if (id==='alfabet') card.textContent = S.letterCase==='both' ? it.L+' '+it.L.toLowerCase() : disp(it.L,S.letterCase);
+  if (id==='hitta') card.textContent = disp(it.L,it.c);
+  if (id==='lyssna' || id==='para'){
+    card.classList.add('compact');
+    card.textContent = id==='lyssna' ? '👂' : disp(it.L,it.c);
+    it.opts = it.opts || shuffle([it.L, ...shuffle(ALPHA.filter(x=>x!==it.L)).slice(0,3)]);
+    const oc = id==='para' ? (it.c==='upper'?'lower':'upper') : it.c;
+    ch.hidden = false;
+    ch.innerHTML = it.opts.map((L,i)=>`<button class="choice" data-k="${L}" style="background:var(${COLORS[(i*2+G.i)%6]})">${disp(L,oc)}</button>`).join('');
+  }
+  if (id==='ord'){
+    card.classList.add('compact');
+    card.innerHTML = `<span class="pic">${it.e}</span><div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${i<G.pos?'done':i===G.pos?'now':''}">${disp(L,it.c)}</span>`).join('')}</div>`;
+  }
+  const p = $('#progress');
+  if (id==='alfabet') p.innerHTML = ALPHA.map((L,i)=>`<span class="dot ${i<G.i?'done':i===G.i?'now':''}" ${i<G.i?`style="background:var(${COLORS[i%6]})"`:''}>${disp(L,S.letterCase==='lower'?'lower':'upper')}</span>`).join('');
+  else p.innerHTML = G.items.map((_,i)=>`<span class="pip ${i<G.i?'done':''}">${i<G.i?(i%2?'🦄':'🐞'):''}</span>`).join('');
+}
+
+function hint(){
+  const t = target();
+  $$(`#kb [data-k="${t}"], #choices [data-k="${t}"]`).forEach(e=>e.classList.add('hint'));
+}
+function flash(cls){ const c = $('#card'); c.classList.remove('yay','no'); void c.offsetWidth; c.classList.add(cls); }
+function showStars(){ $$('.starcount').forEach(e => e.textContent = S.stars); }
+
+function press(k){
+  if (screen!=='game' || !G || G.lock) return;
+  const t = target(), it = item();
+  if (k !== t){
+    G.wrong++; sfxNo(); flash('no');
+    if (G.wrong>=2) hint();
+    const n = G.id==='alfabet'||G.id==='ord' ? t : nameOf(t, G.id==='para' ? null : it.c);
+    say(pick(T.wrong(k,n)));
+    return;
+  }
+  S.stars++; save(); showStars(); sfxYes(); flash('yay'); burst(12, $('#card'));
+  const last = G.i === G.items.length-1;
+  if (G.id==='alfabet'){
+    if (last){ G.lock = true; $$('#progress .dot').forEach((d,i)=>{ d.className='dot done'; d.style.background=`var(${COLORS[i%6]})`; }); say(t + '! ' + praise(), win); return; }
+    G.i++; render(); say(pick(T.short) + ' ' + prompt()); return;
+  }
+  if (G.id==='ord'){
+    G.pos++;
+    if (G.pos < it.w.length){ render(); say(pick(T.short) + ' ' + prompt()); return; }
+    G.lock = true; render(); burst(16, $('#card'));
+    say((it.isName ? T.wroteName : T.wrote(it.w.toLowerCase())) + praise(), () => advance(last)); return;
+  }
+  G.lock = true;
+  if (G.id==='lyssna') $('#card').textContent = disp(it.L,it.c);
+  $$('#choices .choice').forEach(b => { if (b.dataset.k!==t) b.style.opacity = .25; });
+  say(praise(), () => advance(last));
+}
+function advance(last){
+  if (!G) return;
+  if (last) return win();
+  G.i++; G.pos = 0; G.lock = false; render(); say(prompt());
+}
+function win(){
+  if (!G) return;
+  const id = G.id; G = null;
+  const st = pick(STICKERS); S.stickers.push(st); S.stars += 5; save();
+  $('#prize').textContent = st;
+  show('win'); refresh(); sfxWin(); rain(70);
+  say(fmt(T.winSay(T.win[id])));
+}
+
+/* ---------- buttons & keys ---------- */
+$('#name').value = S.name;
+$('#go').onclick = begin;
+$('#toHome').onclick = () => goHome();
+$('#winHome').onclick = () => goHome();
+$('#replay').onclick = () => startGame(lastId);
+$('#again').onclick = () => { if (G && !G.lock) say(prompt()); };
+$('#langSeg').addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (!b) return; S.lang = b.dataset.lang; save(); applyLang(); });
+
+const dlg = $('#settings');
+$('#openSettings').onclick = () => { refresh(); loadVoices(); $('#fullscreen').hidden = !document.fullscreenEnabled; dlg.showModal(); };
+$('#closeSettings').onclick = () => dlg.close();
+$('#changeName').onclick = () => { dlg.close(); G = null; tok++; try { synth?.cancel(); } catch {} show('start'); };
+document.addEventListener('click', e => { const b = e.target.closest('[data-case]'); if (!b) return; S.letterCase = b.dataset.case; save(); refresh();
+  if (!dlg.open) say(T.caseSay[S.letterCase]); });
+$('#optVoice').onchange = e => { S.voice = e.target.checked; if (!S.voice) try { synth?.cancel(); } catch {} save(); };
+$('#optSfx').onchange = e => { S.sfx = e.target.checked; save(); };
+$('#optKb').onchange = e => { S.kb = e.target.checked; save(); buildKb(); };
+$('#optRate').onchange = e => { S.rate = +e.target.value; save(); };
+$('#optVoiceName').onchange = e => { S.voiceNames[S.lang] = e.target.value; save(); };
+$('#testVoice').onclick = () => say(fmt(T.test));
+$('#fullscreen').onclick = () => { (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen())?.catch?.(()=>{}); };
+let armed = false;
+$('#reset').onclick = e => {
+  if (!armed){ armed = true; e.target.textContent = T.ui.setResetArm; setTimeout(()=>{ if (armed){ armed=false; e.target.textContent=T.ui.setReset; } }, 4000); return; }
+  S.stars = 0; S.stickers = []; save(); refresh(); armed = false; e.target.textContent = T.ui.setResetDone;
+};
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || dlg.open) return;
+  if (screen==='start'){ if (e.key==='Enter'){ e.preventDefault(); begin(); } return; }
+  if (e.key==='Escape'){ if (screen!=='home') goHome(); return; }
+  if (screen==='home'){ const n = e.key.length===1 ? '12345'.indexOf(e.key) : -1; if (n>=0){ e.preventDefault(); startGame(GAME_META[n].id); } return; }
+  if (screen==='win'){ if (e.key==='Enter' || e.key===' '){ e.preventDefault(); startGame(lastId); } return; }
+  if (screen==='game'){
+    if (e.key===' ' || e.key==='Enter'){ e.preventDefault(); if (G && !G.lock) say(prompt()); return; }
+    const k = e.key.toLocaleUpperCase(S.lang);
+    if (k.length===1 && ALPHA.includes(k)){ e.preventDefault(); press(k); }
+  }
+});
+
+applyLang();
+if (!S.name && matchMedia('(pointer:fine)').matches) $('#name').focus();
+})();
+</script>
+</body>
+</html>

@@ -9,4 +9,12 @@
 //   tags: ["JS", "demo"],
 // }
 
-window.PROJECTS = [];
+window.PROJECTS = [
+  {
+    title: "Letter Adventure",
+    description:
+      "A playful letter game for children from about age four. Type the alphabet, find letters, match big and small, and spell words, guided by a cheerful voice with unicorns and ladybugs. In Swedish and English.",
+    url: "projects/letter-adventure/",
+    tags: ["Kids", "Game", "Svenska / English"],
+  },
+];
