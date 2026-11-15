@@ -1,0 +1,12 @@
+{
+  "name": "Best Move Chess",
+  "short_name": "Best Move",
+  "description": "Free chess training: keep finding Stockfish's best move for as long as you can.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafb",
+  "theme_color": "#5b4fd6",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

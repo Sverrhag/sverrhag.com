@@ -42,11 +42,12 @@ window.PROJECTS = [
     title: "Best Move Chess",
     description:
       "A chess trainer in the browser. Every move you play is checked against Stockfish. Match the engine's best move to build a streak, or switch to Training Mode and get each mistake explained in plain language, read aloud if you like, in 20 languages. Drill openings and earn badges, take the daily challenge, or send a friend the exact same game.",
-    // Coming soon: no public url yet. The GitHub repo is private, so it
-    // can't be linked either. Add "url: https://chess.sverrhag.com" once
-    // that server answers at GET /api/health — the card becomes clickable
-    // automatically as soon as a url is present.
-    tags: ["Coming soon", "Chess", "Game"],
+    // Server-less build: runs entirely in the visitor's browser (Stockfish
+    // 18 Lite, explanations, read-aloud, opening drills, stats — all stored
+    // locally). Leaderboard, login, feedback and the Berserk/Reckless/Lc0
+    // engines need a server and are locked with a notice in this build.
+    url: "projects/chess/",
+    tags: ["Chess", "Game"],
     thumbnail: "assets/img/projects/best-move-chess.jpg",
   },
 ];
