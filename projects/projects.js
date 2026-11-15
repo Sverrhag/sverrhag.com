@@ -20,7 +20,7 @@ window.PROJECTS = [
   {
     title: "Letter Adventure",
     description:
-      "A playful letter game for children from about age four. Type the alphabet, find letters, match big and small, and spell words, guided by a cheerful voice with unicorns and ladybugs. In Swedish and English.",
+      "A playful letter game for children ages 3 to 7. Nine games across five difficulty levels: type the alphabet, find letters, match big and small, spell words, match pictures to words, read words, find the first letter, and spot a missing one — guided by cheerful recorded voices with unicorns and ladybugs. In Swedish and English.",
     url: "projects/letter-adventure/",
     tags: ["Kids", "Game", "Svenska / English"],
     thumbnail: "assets/img/projects/letter-adventure.jpg",
@@ -35,6 +35,10 @@ window.PROJECTS = [
         { key: "game-lyssna", label: "Listen, starts" },
         { key: "game-para", label: "Big and small, starts" },
         { key: "game-ord", label: "Spell words, starts" },
+        { key: "game-bildord", label: "Picture and word, starts" },
+        { key: "game-lasord", label: "Read the word, starts" },
+        { key: "game-forsta", label: "First letter, starts" },
+        { key: "game-saknad", label: "Missing letter, starts" },
       ],
     },
   },
