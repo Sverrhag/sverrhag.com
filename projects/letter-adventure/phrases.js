@@ -1,0 +1,121 @@
+// All language data for Letter Adventure, shared by the game (game.js) and the
+// voice generator (tools/generate-voices.mjs).
+//
+// Spoken phrases live in `g` (general), `per` (one clip per letter) and
+// `perWord` (one clip per word). A marker like "{, n}" is where the player's
+// name is shown on screen; the recorded audio leaves it out.
+(function (root) {
+const LANGS = {
+sv: {
+  code: 'sv-SE', alpha: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ', kb: ['QWERTYUIOPÅ', 'ASDFGHJKLÖÄ', 'ZXCVBNM'],
+  title: 'Bokstavsäventyret', friend: 'kompis',
+  poss: n => n + (/[sxz]$/i.test(n) ? '' : 's'),
+  homeTitle: p => `${p} bokstäver`, shelfTitle: p => `${p} klistermärken`,
+  ui: {
+    tagline: 'Lär dig bokstäverna med enhörningen och nyckelpigan',
+    nameLabel: 'Vad heter du?', namePh: 'Skriv ditt namn', start: 'Börja spela 🐞',
+    aboutH: 'Om spelet',
+    about: 'Ett bokstavsspel för barn från ungefär fyra år. Barnet övar på att känna igen och skriva bokstäver, med tangentbord eller pekskärm, i fem små spel. En glad röst guidar, berömmer varje rätt svar och hjälper vänligt till när det blir fel. Välj mellan fem röster, och mellan stora bokstäver, små bokstäver eller båda.',
+    tip: 'Fungerar i webbläsaren på surfplatta, dator och mobil. Inget konto och ingen reklam. Stjärnor och klistermärken sparas bara i den här webbläsaren. Spelet räknar anonymt hur många gånger det spelas.',    noStickers: 'Här hamnar dina klistermärken när du har spelat klart ett spel.',
+    replay: 'Spela igen', winHome: '🏠 Hem', ariaHome: 'Hem', ariaAgain: 'Lyssna igen',
+    setH: 'Inställningar för vuxna', setLetters: 'Bokstäver', caseU: 'STORA', caseL: 'små', caseB: 'Båda',
+    setVoice: 'Röst som guidar', setVoiceName: 'Välj röst', setRate: 'Röstens tempo',
+    setSfx: 'Ljudeffekter', setKb: 'Tangentbord på skärmen', setFull: '⛶ Helskärm',
+    setReset: 'Nollställ stjärnor', setResetArm: 'Tryck igen för att nollställa', setResetDone: 'Nollställt!',
+    setChange: 'Byt namn eller språk', setDone: 'Klar',
+  },
+  games: [['Alfabetet', 'A till Ö i rätt ordning'], ['Hitta bokstaven', 'Tryck på rätt tangent'], ['Lyssna', 'Vilken bokstav hör du?'], ['Stor och liten', 'Vilka hör ihop?'], ['Skriv ord', 'Bokstav för bokstav']],
+  words: [['SOL', '☀️'], ['KO', '🐮'], ['BIL', '🚗'], ['BOK', '📖'], ['HUS', '🏠'], ['KATT', '🐱'], ['HUND', '🐶'], ['FISK', '🐟'], ['BÅT', '⛵'], ['MÅNE', '🌙'], ['ORM', '🐍'], ['GRIS', '🐷'], ['HÄST', '🐴'], ['TÅG', '🚂'], ['BOLL', '⚽'], ['ÄPPLE', '🍎'], ['GLASS', '🍦'], ['BLOMMA', '🌸'], ['MAMMA', '👩'], ['PAPPA', '👨'], ['ÖRA', '👂'], ['ÄGG', '🥚'], ['RÄV', '🦊'], ['BJÖRN', '🐻'], ['MUS', '🐭'], ['KAKA', '🍪'], ['HJÄRTA', '💖'], ['FJÄRIL', '🦋'], ['KRONA', '👑'], ['TÅRTA', '🎂'],
+          ['ENHÖRNING', '🦄'], ['NYCKELPIGA', '🐞'], ['REGNBÅGE', '🌈']],
+  finale: 3, // the last three words are the long finale words
+  voices: ['Enhörningen', 'Nyckelpigan', 'Ugglan', 'Björnen', 'Räven'],
+  hello: ['Hej! Jag är enhörningen. Ska vi leka med bokstäver?', 'Hej hej! Jag är nyckelpigan. Ska vi leka med bokstäver?', 'Hej! Jag är ugglan. Ska vi leka med bokstäver?', 'Hej! Jag är björnen. Ska vi leka med bokstäver?', 'Hej! Jag är räven. Ska vi leka med bokstäver?'],
+  g: {
+    greet: 'Hej{ n}! Välkommen till Bokstavsäventyret! Vad vill du spela?',
+    homeAgain: ['Vad vill du spela nu?', 'Välj ett spel!', 'Vilket spel blir det nu?'],
+    caseUpper: 'Nu övar vi på stora bokstäver!', caseLower: 'Nu övar vi på små bokstäver!', caseBoth: 'Nu övar vi på både stora och små bokstäver!',
+    introAlfabet: 'Nu skriver vi hela alfabetet!', introHitta: 'Nu letar vi bokstäver på tangentbordet!', introLyssna: 'Lyssna noga!', introPara: 'Nu parar vi ihop stora och små bokstäver!', introOrd: 'Nu skriver vi ord!',
+    alphaLast: 'Och sist kommer Ö!',
+    short: ['Bra!', 'Ja!', 'Rätt!', 'Snyggt!', 'Toppen!', 'Precis!', 'Härligt!', 'Wow!', 'Super!', 'Jättebra!'],
+    long: ['Bra jobbat{, n}!', 'Superbra{, n}!', 'Du är en stjärna!', 'Wow, helt rätt!', 'Heja{ n}!', 'Fantastiskt!', 'Jättebra{, n}!', 'Vad duktig du är!', 'Enhörningen dansar av glädje!', 'Nyckelpigan är så stolt över dig!', 'Du är en bokstavsmästare!', 'Perfekt{, n}!', 'Strålande!', 'Vilken stjärna du är!', 'Magiskt bra!', 'Regnbågsbra{, n}!', 'Nyckelpigan gör en glädjevolt!', 'Enhörningen jublar!'],
+    wrong: ['Oj, inte riktigt.', 'Nästan! Försök igen.', 'Hoppsan! Titta en gång till.'],
+    nameStart: 'Skriv ditt namn!', wroteName: 'Du skrev ditt namn!',
+    hurra: 'Hurra{, n}!',
+    winAlfabet: 'Du skrev hela alfabetet, från A till Ö! Du är en riktig bokstavsmästare!', winHitta: 'Du hittade alla bokstäverna! Nyckelpigan är jättestolt!', winLyssna: 'Vilka fina öron du har! Du klarade alla!', winPara: 'Du parade ihop allihop! Enhörningen dansar av glädje!', winOrd: 'Du skrev alla orden helt själv! Fantastiskt!',
+    winTail: 'Du får ett nytt klistermärke och fem stjärnor!',
+  },
+  per: {
+    L: L => `${L}!`,
+    find: L => `Hitta bokstaven ${L}!`, findU: L => `Hitta stora ${L}!`, findL: L => `Hitta lilla ${L}!`,
+    next: L => `Nu kommer ${L}.`, start: L => `Börja med ${L}.`,
+    pairU: L => `Vilken liten bokstav hör ihop med stora ${L}?`, pairL: L => `Vilken stor bokstav hör ihop med lilla ${L}?`,
+  },
+  perWord: { word: w => `Skriv ordet ${w}.`, wrote: w => `Du skrev ${w}!` },
+},
+en: {
+  code: 'en-US', alpha: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', kb: ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'],
+  title: 'Letter Adventure', friend: 'friend',
+  poss: n => n + (/s$/i.test(n) ? '’' : '’s'),
+  homeTitle: p => `${p} letters`, shelfTitle: p => `${p} stickers`,
+  ui: {
+    tagline: 'Learn your letters with the unicorn and the ladybug',
+    nameLabel: 'What is your name?', namePh: 'Type your name', start: 'Start playing 🐞',
+    aboutH: 'About the game',
+    about: 'A letter game for children from about age four. Your child practises recognising and typing letters, with a keyboard or a touch screen, in five small games. A cheerful voice guides the way, praises every right answer and gently helps after a mistake. Choose between five voices, and between big letters, small letters or both.',
+    tip: 'Works in the browser on tablets, computers and phones. No account and no ads. Stars and stickers are saved only in this browser. The game counts, anonymously, how many times it is played.',    noStickers: 'Your stickers will appear here when you finish a game.',
+    replay: 'Play again', winHome: '🏠 Home', ariaHome: 'Home', ariaAgain: 'Listen again',
+    setH: 'Settings for grown-ups', setLetters: 'Letters', caseU: 'BIG', caseL: 'small', caseB: 'Both',
+    setVoice: 'Voice guide', setVoiceName: 'Choose a voice', setRate: 'Voice speed',
+    setSfx: 'Sound effects', setKb: 'On-screen keyboard', setFull: '⛶ Full screen',
+    setReset: 'Reset stars', setResetArm: 'Tap again to reset', setResetDone: 'Reset!',
+    setChange: 'Change name or language', setDone: 'Done',
+  },
+  games: [['The alphabet', 'A to Z in the right order'], ['Find the letter', 'Press the right key'], ['Listen', 'Which letter do you hear?'], ['Big and small', 'Which ones match?'], ['Spell words', 'Letter by letter']],
+  words: [['SUN', '☀️'], ['COW', '🐮'], ['CAR', '🚗'], ['BOOK', '📖'], ['CAT', '🐱'], ['DOG', '🐶'], ['FISH', '🐟'], ['BOAT', '⛵'], ['MOON', '🌙'], ['PIG', '🐷'], ['BALL', '⚽'], ['EGG', '🥚'], ['FOX', '🦊'], ['BEAR', '🐻'], ['STAR', '⭐'], ['CAKE', '🎂'], ['BEE', '🐝'], ['FROG', '🐸'], ['DUCK', '🦆'], ['TREE', '🌳'], ['APPLE', '🍎'], ['HORSE', '🐴'], ['MOUSE', '🐭'], ['HEART', '💖'], ['TRAIN', '🚂'], ['CROWN', '👑'], ['HOUSE', '🏠'], ['FLOWER', '🌸'], ['COOKIE', '🍪'], ['SNAKE', '🐍'],
+          ['UNICORN', '🦄'], ['LADYBUG', '🐞'], ['RAINBOW', '🌈']],
+  finale: 3,
+  voices: ['Unicorn', 'Ladybug', 'Owl', 'Bear', 'Fox'],
+  hello: ['Hi! I am the unicorn. Shall we play with letters?', 'Hello hello! I am the ladybug. Shall we play with letters?', 'Hello! I am the owl. Shall we play with letters?', 'Hello! I am the bear. Shall we play with letters?', 'Hi! I am the fox. Shall we play with letters?'],
+  g: {
+    greet: 'Hi{ n}! Welcome to Letter Adventure! What would you like to play?',
+    homeAgain: ['What would you like to play now?', 'Pick a game!', 'Which game is next?'],
+    caseUpper: 'Now we practise big letters!', caseLower: 'Now we practise small letters!', caseBoth: 'Now we practise both big and small letters!',
+    introAlfabet: 'Let’s type the whole alphabet!', introHitta: 'Let’s find letters on the keyboard!', introLyssna: 'Listen carefully!', introPara: 'Let’s match big and small letters!', introOrd: 'Let’s spell some words!',
+    alphaLast: 'And last comes Z!',
+    short: ['Great!', 'Yes!', 'Right!', 'Nice!', 'Super!', 'Exactly!', 'Lovely!', 'Wow!', 'Awesome!', 'Well done!'],
+    long: ['Great job{, n}!', 'Super{, n}!', 'You are a star!', 'Wow, exactly right!', 'Go{ n}!', 'Fantastic!', 'Well done{, n}!', 'How clever you are!', 'The unicorn is dancing with joy!', 'The ladybug is so proud of you!', 'You are a letter champion!', 'Perfect{, n}!', 'Brilliant!', 'What a star you are!', 'Magically good!', 'Rainbow-tastic{, n}!', 'The ladybug does a happy flip!', 'The unicorn is cheering!'],
+    wrong: ['Oops, not quite.', 'Almost! Try again.', 'Whoops! Look one more time.'],
+    nameStart: 'Spell your name!', wroteName: 'You spelled your name!',
+    hurra: 'Hooray{, n}!',
+    winAlfabet: 'You typed the whole alphabet, from A to Z! You are a real letter champion!', winHitta: 'You found all the letters! The ladybug is so proud!', winLyssna: 'What great ears you have! You got them all!', winPara: 'You matched every one! The unicorn is dancing with joy!', winOrd: 'You spelled all the words by yourself! Fantastic!',
+    winTail: 'You get a new sticker and five stars!',
+  },
+  per: {
+    L: L => `${L}!`,
+    find: L => `Find the letter ${L}!`, findU: L => `Find big ${L}!`, findL: L => `Find small ${L}!`,
+    next: L => `Now comes ${L}.`, start: L => `Start with ${L}.`,
+    pairU: L => `Which small letter goes with big ${L}?`, pairL: L => `Which big letter goes with small ${L}?`,
+  },
+  perWord: { word: w => `Spell the word ${w}.`, wrote: w => `You spelled ${w}!` },
+}};
+
+// What is said aloud: the phrase without its name marker.
+const spoken = s => s.replace(/\{[^}]*\}/g, '');
+
+// Every audio clip for one language and voice, as [id, text] pairs.
+// File names are ASCII: letters and words are referred to by index.
+function clipList(lang, voiceIdx) {
+  const T = LANGS[lang], out = [['hello', T.hello[voiceIdx]]];
+  for (const [key, val] of Object.entries(T.g)) {
+    if (Array.isArray(val)) val.forEach((s, i) => out.push([`${key}_${i}`, spoken(s)]));
+    else out.push([key, spoken(val)]);
+  }
+  [...T.alpha].forEach((L, i) => { for (const [key, fn] of Object.entries(T.per)) out.push([`${key}_${i}`, fn(L)]); });
+  T.words.forEach(([w], i) => { for (const [key, fn] of Object.entries(T.perWord)) out.push([`${key}_${i}`, fn(w.toLowerCase())]); });
+  return out;
+}
+
+const api = { LANGS, spoken, clipList };
+if (typeof module !== 'undefined' && module.exports) module.exports = api;
+else root.LA = api;
+})(typeof window !== 'undefined' ? window : globalThis);
