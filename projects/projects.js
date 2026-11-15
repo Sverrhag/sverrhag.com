@@ -24,27 +24,9 @@ window.PROJECTS = [
     url: "https://letteradventures.com/",
     tags: ["Kids", "Game", "6 languages"],
     thumbnail: "assets/img/projects/letter-adventure.jpg",
-    stats: {
-      namespace: "sverrhag-letter-adventure",
-      counters: [
-        { key: "players", label: "Players (once per browser)" },
-        { key: "lang-sv", label: "Chose Swedish" },
-        { key: "lang-en", label: "Chose English" },
-        { key: "lang-es", label: "Chose Spanish" },
-        { key: "lang-fr", label: "Chose French" },
-        { key: "lang-pt", label: "Chose Portuguese" },
-        { key: "lang-de", label: "Chose German" },
-        { key: "game-alfabet", label: "The alphabet, starts" },
-        { key: "game-hitta", label: "Find the letter, starts" },
-        { key: "game-lyssna", label: "Listen, starts" },
-        { key: "game-para", label: "Big and small, starts" },
-        { key: "game-ord", label: "Spell words, starts" },
-        { key: "game-bildord", label: "Picture and word, starts" },
-        { key: "game-lasord", label: "Read the word, starts" },
-        { key: "game-forsta", label: "First letter, starts" },
-        { key: "game-saknad", label: "Missing letter, starts" },
-      ],
-    },
+    // No stats field: the game no longer calls any third-party counter
+    // (removed for GDPR/consent reasons around child visitors' IPs). The
+    // sverrhag-letter-adventure namespace gets no further hits.
   },
   {
     title: "Best Move Chess",
