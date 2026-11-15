@@ -328,5 +328,10 @@
  "word_32": "en-US-Chirp3-HD-Puck|1|Spell the word rainbow.",
  "wrote_32": "en-US-Chirp3-HD-Puck|1|You spelled rainbow!",
  "modeEasy": "en-US-Chirp3-HD-Puck|1|Now we play on the easy level.",
- "modeHard": "en-US-Chirp3-HD-Puck|1|Now it gets a little harder. You can do it!"
+ "modeHard": "en-US-Chirp3-HD-Puck|1|Now it gets a little harder. You can do it!",
+ "level_0": "en-US-Chirp3-HD-Puck|1|Level one!",
+ "level_1": "en-US-Chirp3-HD-Puck|1|Level two!",
+ "level_2": "en-US-Chirp3-HD-Puck|1|Level three!",
+ "level_3": "en-US-Chirp3-HD-Puck|1|Level four!",
+ "level_4": "en-US-Chirp3-HD-Puck|1|Level five!"
 }

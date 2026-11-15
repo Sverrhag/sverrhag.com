@@ -15,10 +15,29 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 
 /* ---------- state ---------- */
 const KEY = 'letter-adventure-v1';
-const S = {name:'', lang:(navigator.language||'').toLowerCase().startsWith('sv') ? 'sv' : 'en', letterCase:'upper', voice:true, voiceChar:0, speed:1, sfx:true, kb:true, stars:0, stickers:[], hard:false, boards:{}};
+const S = {name:'', lang:(navigator.language||'').toLowerCase().startsWith('sv') ? 'sv' : 'en', letterCase:'upper', voice:true, voiceChar:0, speed:1, sfx:true, kb:true, stars:0, stickers:[], age:null, level:2, boards:{}};
 try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch {}
 if (!LANGS[S.lang]) S.lang = 'en';
 if (!VOICE_EM[S.voiceChar]) S.voiceChar = 0;
+
+/* ---------- difficulty: level 1 (age 3) to level 5 (age 7) ----------
+   rounds   letters per round in the find, listen and match games
+   choices  buttons to choose between in the listen and match games
+   hintAt   mistakes on one letter before the right key lights up (0 = lit from the start)
+   show     the letter to press is shown; false hides it until hintAt mistakes
+   say      the voice names the next letter in the alphabet and spelling games
+   words    how many short, medium and long words in the spelling game
+   short    longest "short" word */
+const LEVELS = [null,
+  {rounds:5,  choices:2, hintAt:0, show:true,  say:true,  words:[2,0,0], short:3},
+  {rounds:8,  choices:3, hintAt:1, show:true,  say:true,  words:[3,0,0], short:4},
+  {rounds:10, choices:4, hintAt:2, show:true,  say:false, words:[3,1,1], short:4},
+  {rounds:10, choices:5, hintAt:2, show:false, say:false, words:[3,1,1], short:4},
+  {rounds:12, choices:6, hintAt:3, show:false, say:false, words:[2,2,2], short:4},
+];
+if (S.hard !== undefined){ S.level = S.hard ? 4 : 2; delete S.hard; } // from the earlier easy/hard switch
+if (!LEVELS[S.level]) S.level = 2;
+const LV = () => LEVELS[S.level];
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
 let T = LANGS[S.lang], ALPHA = [...T.alpha];
 
@@ -33,7 +52,7 @@ const shown = s => s.replace(/\{([^}]*)n\}/g, (_, pre) => S.name ? pre + S.name 
 
 /* ---------- alphabet clock and top list (kept in this browser) ---------- */
 const PENALTY = 5000; // each mistake costs five seconds
-const boardKey = () => `${S.lang}-${S.hard ? 'hard' : 'easy'}`;
+const boardKey = () => `${S.lang}-L${S.level}`;
 const fmtTime = ms => { const t = Math.round(ms/100); return `${Math.floor(t/600)}:${String(Math.floor(t/10)%60).padStart(2,'0')}${T.dec}${t%10}`; };
 function fillBoard(ol, mark){
   const list = S.boards[boardKey()] || [];
@@ -161,7 +180,9 @@ function refresh(){
   $$('.starcount').forEach(e => e.textContent = S.stars);
   $$('[data-case]').forEach(b => b.setAttribute('aria-pressed', b.dataset.case===S.letterCase));
   $$('[data-voice]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.voice===S.voiceChar));
-  $$('[data-level]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.level==='hard')===S.hard));
+  $$('[data-level]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.level===S.level));
+  $$('[data-age]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.age===S.age));
+  $('#levelChip').textContent = T.ui.levelChip(S.level);
   $$('.who').forEach(e => e.textContent = VOICE_EM[S.voiceChar]);
   const st = $('#stickers');
   st.classList.toggle('none', !S.stickers.length);
@@ -206,9 +227,10 @@ function startGame(id){
   else if (id==='ord'){
     const all = T.words.map(([w,e],wi)=>({w,e,wi}));
     const pool = shuffle(all.slice(0, -T.finale)), me = nameWord();
-    const ws = [...(me ? [{w:me, e:'💖', isName:true}] : []), ...pool.filter(x=>x.w.length<=4).slice(0, me ? 3 : 4), pool.find(x=>x.w.length>=5), pick(all.slice(-T.finale))];
+    const [nShort, nMedium, nLong] = LV().words;
+    const ws = [...(me ? [{w:me, e:'💖', isName:true}] : []), ...pool.filter(x=>x.w.length<=LV().short).slice(0, nShort), ...pool.filter(x=>x.w.length>=5).slice(0, nMedium), ...shuffle(all.slice(-T.finale)).slice(0, nLong)];
     G.items = ws.map(x=>({...x, c:pickCase()}));
-  } else G.items = shuffle(ALPHA).slice(0,10).map(L=>({L,c:pickCase()}));
+  } else G.items = shuffle(ALPHA).slice(0, LV().rounds).map(L=>({L,c:pickCase()}));
   hit('game-' + id);
   show('game'); buildKb(); render();
   say([g('intro'+cap(id)), ...prompt()]);
@@ -221,15 +243,15 @@ function prompt(){
   const it = item(), L = target();
   switch (G.id){
     case 'alfabet':
-      if (S.hard) return []; // the harder level never says which letter comes next
+      if (!LV().say) return []; // from level 3 the voice no longer says which letter comes next
       if (G.i===0) return [per('start',L)];
       if (G.i===ALPHA.length-1) return [g('alphaLast')];
       return [per('next',L)];
     case 'hitta': case 'lyssna': return [per(findKey(it.c), L)];
     case 'para': return [per(it.c==='upper' ? 'pairU' : 'pairL', L)];
     case 'ord':
-      if (G.pos>0) return S.hard ? [] : [per('next',L)];
-      return [it.isName ? g('nameStart') : wordPart('word',it), !S.hard && per('start',L)];
+      if (G.pos>0) return LV().say ? [per('next',L)] : [];
+      return [it.isName ? g('nameStart') : wordPart('word',it), LV().say && per('start',L)];
   }
 }
 
@@ -238,35 +260,38 @@ function render(){
   G.wrong = 0;
   card.className = ''; ch.innerHTML = ''; ch.hidden = true;
   $$('.hint').forEach(e=>e.classList.remove('hint'));
-  if (id==='alfabet') card.textContent = S.hard ? '?' : S.letterCase==='both' ? it.L+' '+it.L.toLowerCase() : disp(it.L,S.letterCase);
-  if (id==='hitta') card.textContent = S.hard ? '👂' : disp(it.L,it.c);
+  const hide = !LV().show;
+  if (id==='alfabet') card.textContent = hide ? '?' : S.letterCase==='both' ? it.L+' '+it.L.toLowerCase() : disp(it.L,S.letterCase);
+  if (id==='hitta') card.textContent = hide ? '👂' : disp(it.L,it.c);
   if (id==='lyssna' || id==='para'){
     card.classList.add('compact');
     card.textContent = id==='lyssna' ? '👂' : disp(it.L,it.c);
-    it.opts = it.opts || shuffle([it.L, ...shuffle(ALPHA.filter(x=>x!==it.L)).slice(0, S.hard ? 5 : 3)]);
+    it.opts = it.opts || shuffle([it.L, ...shuffle(ALPHA.filter(x=>x!==it.L)).slice(0, LV().choices - 1)]);
     const oc = id==='para' ? (it.c==='upper'?'lower':'upper') : it.c;
     ch.hidden = false;
     ch.innerHTML = it.opts.map((L,i)=>`<button class="choice" data-k="${L}" style="background:var(${COLORS[(i*2+G.i)%6]})">${disp(L,oc)}</button>`).join('');
   }
   if (id==='ord'){
     card.classList.add('compact');
-    card.innerHTML = `<span class="pic">${it.e}</span><div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${i<G.pos?'done':i===G.pos?'now':''}">${S.hard && i>=G.pos ? '' : disp(L,it.c)}</span>`).join('')}</div>`;
+    card.innerHTML = `<span class="pic">${it.e}</span><div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${i<G.pos?'done':i===G.pos?'now':''}">${hide && i>=G.pos ? '' : disp(L,it.c)}</span>`).join('')}</div>`;
   }
   card.classList.toggle('tap', card.textContent==='👂');
   const p = $('#progress');
-  if (id==='alfabet') p.innerHTML = ALPHA.map((L,i)=>`<span class="dot ${i<G.i?'done':i===G.i?'now':''}" ${i<G.i?`style="background:var(${COLORS[i%6]})"`:''}>${S.hard && i>=G.i ? '' : disp(L,S.letterCase==='lower'?'lower':'upper')}</span>`).join('');
+  if (id==='alfabet') p.innerHTML = ALPHA.map((L,i)=>`<span class="dot ${i<G.i?'done':i===G.i?'now':''}" ${i<G.i?`style="background:var(${COLORS[i%6]})"`:''}>${hide && i>=G.i ? '' : disp(L,S.letterCase==='lower'?'lower':'upper')}</span>`).join('');
   else p.innerHTML = G.items.map((_,i)=>`<span class="pip ${i<G.i?'done':''}">${i<G.i?(i%2?'🦄':'🐞'):''}</span>`).join('');
+  // On the easiest level the right key is lit from the start in the typing games.
+  if (LV().hintAt===0 && id!=='lyssna' && id!=='para') hint();
 }
 
 function hint(){
   const t = target();
   $$(`#kb [data-k="${t}"], #choices [data-k="${t}"]`).forEach(e=>e.classList.add('hint'));
 }
-// After two mistakes: light up the key, and on the harder level show the hidden letter.
+// After enough mistakes: light up the key, and on the levels that hide the letter, show it.
 function reveal(){
   const t = target(), it = item();
   hint();
-  if (!S.hard) return;
+  if (LV().show) return;
   if (G.id==='alfabet' || G.id==='hitta'){ const c = $('#card'); c.textContent = disp(t, it.c || (S.letterCase==='lower' ? 'lower' : 'upper')); c.classList.remove('tap'); }
   if (G.id==='ord'){ const s = $('#card .slot.now'); if (s) s.textContent = disp(t, it.c); }
 }
@@ -278,9 +303,10 @@ function press(k){
   const t = target(), it = item();
   if (k !== t){
     G.wrong++; G.errs++; sfxNo(); flash('no');
-    if (G.wrong>=2) reveal();
-    // On the harder level the answer is only said aloud once it has been revealed.
-    const tell = !S.hard || G.wrong>=2 || (G.id!=='alfabet' && G.id!=='ord');
+    const helped = G.wrong >= Math.max(1, LV().hintAt);
+    if (helped) reveal();
+    // Where the letter is hidden, the answer is only said aloud once it has been revealed.
+    const tell = LV().show || helped || (G.id!=='alfabet' && G.id!=='ord');
     say([g('wrong'), tell && per(G.id==='hitta' || G.id==='lyssna' ? findKey(it.c) : 'find', t)]);
     return;
   }
@@ -337,11 +363,12 @@ $('#again').onclick = repeat;
 $('#card').onclick = () => { if ($('#card').classList.contains('tap')) repeat(); };
 const boardDlg = $('#boardDlg');
 $('#openBoard').onclick = () => {
-  $('#boardTitle').textContent = `${T.ui.boardH} (${S.hard ? T.ui.lvlHard : T.ui.lvlEasy})`;
+  $('#boardTitle').textContent = `${T.ui.boardH} (${T.ui.levelChip(S.level).toLowerCase()})`;
   $('#boardEmpty').hidden = fillBoard($('#boardList')) > 0;
   boardDlg.showModal();
 };
 $('#closeBoard').onclick = () => boardDlg.close();
+$('#levelChip').onclick = () => $('#openSettings').click();
 $('#langSeg').addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (!b) return; S.lang = b.dataset.lang; save(); applyLang(); });
 
 const dlg = $('#settings');
@@ -352,7 +379,9 @@ document.addEventListener('click', e => {
   const c = e.target.closest('[data-case]');
   if (c){ S.letterCase = c.dataset.case; save(); refresh(); if (!dlg.open) say(g('case'+cap(S.letterCase))); return; }
   const lv = e.target.closest('[data-level]');
-  if (lv){ S.hard = lv.dataset.level==='hard'; save(); refresh(); say(g(S.hard ? 'modeHard' : 'modeEasy')); return; }
+  if (lv){ S.level = +lv.dataset.level; save(); refresh(); say({id:`level_${S.level-1}`, text:T.g.level[S.level-1]}); return; }
+  const ag = e.target.closest('[data-age]');
+  if (ag){ S.age = +ag.dataset.age; S.level = S.age - 2; save(); refresh(); return; }
   const v = e.target.closest('[data-voice]');
   if (v){ S.voiceChar = +v.dataset.voice; save(); refresh(); say({id:'hello', text:T.hello[S.voiceChar]}); }
 });
