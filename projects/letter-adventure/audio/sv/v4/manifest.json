@@ -352,5 +352,10 @@
  "word_32": "sv-SE-Chirp3-HD-Charon|1|Skriv ordet regnbåge.",
  "wrote_32": "sv-SE-Chirp3-HD-Charon|1|Du skrev regnbåge!",
  "modeEasy": "sv-SE-Chirp3-HD-Charon|1|Nu spelar vi på lätt nivå.",
- "modeHard": "sv-SE-Chirp3-HD-Charon|1|Nu blir det lite svårare. Du klarar det!"
+ "modeHard": "sv-SE-Chirp3-HD-Charon|1|Nu blir det lite svårare. Du klarar det!",
+ "level_0": "sv-SE-Chirp3-HD-Charon|1|Nivå ett!",
+ "level_1": "sv-SE-Chirp3-HD-Charon|1|Nivå två!",
+ "level_2": "sv-SE-Chirp3-HD-Charon|1|Nivå tre!",
+ "level_3": "sv-SE-Chirp3-HD-Charon|1|Nivå fyra!",
+ "level_4": "sv-SE-Chirp3-HD-Charon|1|Nivå fem!"
 }

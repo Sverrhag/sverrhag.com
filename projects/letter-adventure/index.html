@@ -104,6 +104,9 @@ dialog .voice[aria-pressed="true"]{background:var(--card)}
 #prize{font-size:clamp(100px,28vh,240px); line-height:1; animation:pop .9s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes pop{from{transform:scale(0) rotate(-40deg)}}
 
+.seg.nums button{min-width:52px; padding-left:10px; padding-right:10px}
+#levelChip{background:var(--card); box-shadow:0 5px 0 var(--line); font-size:18px; padding:10px 18px}
+
 /* --- top list --- */
 .board{width:100%; max-width:420px; text-align:left}
 #result{background:var(--card); border-radius:26px; padding:12px 20px; box-shadow:0 5px 0 var(--line)}
@@ -202,6 +205,10 @@ dialog .seg button{font-size:18px; padding:6px 14px}
       <label for="name" data-t="nameLabel"></label>
       <input id="name" type="text" maxlength="16" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go">
     </div>
+    <div class="vlabel" data-t="ageLabel"></div>
+    <div class="seg nums" id="ageSeg" role="group" data-ta="ageLabel">
+      <button data-age="3">3</button><button data-age="4">4</button><button data-age="5">5</button><button data-age="6">6</button><button data-age="7">7</button>
+    </div>
     <div class="vlabel" data-t="setVoiceName"></div>
     <div class="voices" role="group" data-ta="setVoiceName"></div>
     <button class="big" id="go" data-t="start"></button>
@@ -227,9 +234,7 @@ dialog .seg button{font-size:18px; padding:6px 14px}
     <div class="seg" id="caseSeg" role="group" data-ta="setLetters">
       <button data-case="upper">ABC</button><button data-case="lower">abc</button><button data-case="both">Aa</button>
     </div>
-    <div class="seg" id="levelSeg" role="group" data-ta="ariaLevel">
-      <button data-level="easy" data-t="levelEasy"></button><button data-level="hard" data-t="levelHard"></button>
-    </div>
+    <button class="pill" id="levelChip"></button>
   </div>
   <div class="shelf"><b id="shelfTitle"></b><div id="stickers"></div></div>
   <span class="walker">🐞</span>
@@ -266,6 +271,10 @@ dialog .seg button{font-size:18px; padding:6px 14px}
   <div class="opt"><label data-t="setLetters"></label>
     <div class="seg" role="group">
       <button data-case="upper" data-t="caseU"></button><button data-case="lower" data-t="caseL"></button><button data-case="both" data-t="caseB"></button>
+    </div></div>
+  <div class="opt"><label data-t="setLevel"></label>
+    <div class="seg nums" role="group" data-ta="setLevel">
+      <button data-level="1">1</button><button data-level="2">2</button><button data-level="3">3</button><button data-level="4">4</button><button data-level="5">5</button>
     </div></div>
   <div class="opt"><label for="optVoice" data-t="setVoice"></label><input type="checkbox" id="optVoice"></div>
   <div class="opt"><label data-t="setVoiceName"></label><div class="voices" role="group" data-ta="setVoiceName"></div></div>
