@@ -350,5 +350,7 @@
  "word_31": "sv-SE-Chirp3-HD-Kore|1|Skriv ordet nyckelpiga.",
  "wrote_31": "sv-SE-Chirp3-HD-Kore|1|Du skrev nyckelpiga!",
  "word_32": "sv-SE-Chirp3-HD-Kore|1|Skriv ordet regnbåge.",
- "wrote_32": "sv-SE-Chirp3-HD-Kore|1|Du skrev regnbåge!"
+ "wrote_32": "sv-SE-Chirp3-HD-Kore|1|Du skrev regnbåge!",
+ "modeEasy": "sv-SE-Chirp3-HD-Kore|1|Nu spelar vi på lätt nivå.",
+ "modeHard": "sv-SE-Chirp3-HD-Kore|1|Nu blir det lite svårare. Du klarar det!"
 }

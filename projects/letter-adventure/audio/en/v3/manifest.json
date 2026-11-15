@@ -326,5 +326,7 @@
  "word_31": "en-US-Chirp3-HD-Kore|1|Spell the word ladybug.",
  "wrote_31": "en-US-Chirp3-HD-Kore|1|You spelled ladybug!",
  "word_32": "en-US-Chirp3-HD-Kore|1|Spell the word rainbow.",
- "wrote_32": "en-US-Chirp3-HD-Kore|1|You spelled rainbow!"
+ "wrote_32": "en-US-Chirp3-HD-Kore|1|You spelled rainbow!",
+ "modeEasy": "en-US-Chirp3-HD-Kore|1|Now we play on the easy level.",
+ "modeHard": "en-US-Chirp3-HD-Kore|1|Now it gets a little harder. You can do it!"
 }
