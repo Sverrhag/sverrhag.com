@@ -8,6 +8,11 @@
 <meta property="og:title" content="Letter Adventure / Bokstavsäventyret">
 <meta property="og:description" content="A playful letter-learning game for young children, in Swedish and English.">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Letter Adventure">
+<meta name="theme-color" content="#ffd9ec">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦄%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@400;600;700&display=swap">
 <style>
@@ -106,6 +111,11 @@ dialog .voice[aria-pressed="true"]{background:var(--card)}
 
 .seg.nums button{min-width:52px; padding-left:10px; padding-right:10px}
 #levelChip{background:var(--card); box-shadow:0 5px 0 var(--line); font-size:18px; padding:10px 18px}
+
+#install{margin-top:12px; padding-top:10px; border-top:2px solid var(--line)}
+#install ul{gap:6px}
+#installBtn{background:var(--pink); color:#fff; font-size:18px; padding:10px 20px; margin-bottom:10px}
+#installed{margin:12px 0 0; padding-top:10px; border-top:2px solid var(--line); font-weight:600}
 
 /* --- top list --- */
 .board{width:100%; max-width:420px; text-align:left}
@@ -220,7 +230,14 @@ dialog .seg button{font-size:18px; padding:6px 14px}
       <h2 data-t="aboutH"></h2>
       <p data-t="about"></p>
       <ul id="aboutList"></ul>
-      <p class="tip" data-t="tip"></p>    </div>
+      <p class="tip" data-t="tip"></p>
+      <div id="install">
+        <h2 data-t="installH"></h2>
+        <p data-t="installIntro"></p>
+        <button class="pill" id="installBtn" data-t="installBtn" hidden></button>
+        <ul id="installSteps"></ul>
+      </div>
+      <p id="installed" data-t="installed" hidden></p>    </div>
     <a class="back" href="/#projects">← sverrhag.com</a>
   </div>
 </section>

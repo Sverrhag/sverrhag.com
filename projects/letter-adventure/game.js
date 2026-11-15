@@ -91,6 +91,15 @@ const live = location.protocol === 'https:' && !/^(localhost|127\.)/.test(locati
 // game-para, game-ord. They are only written here; the site's statistics page reads them.
 const hit = key => { if (live) fetch(`${STATS}/hit/${NS}/${key}`).catch(() => {}); };
 
+/* ---------- installing as an app ---------- */
+// Opened from its home-screen icon the game runs without browser bars; then the instructions are not needed.
+const isInstalled = () => matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || navigator.standalone === true;
+function showInstallState(){ const on = isInstalled(); $('#install').hidden = on; $('#installed').hidden = !on; }
+let installPrompt = null;
+// Chrome offers its own install dialog; where it does, show a button for it.
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; $('#installBtn').hidden = false; });
+addEventListener('appinstalled', () => { installPrompt = null; $('#installBtn').hidden = true; });
+
 /* ---------- phrases: {id, text} parts ---------- */
 function g(key){
   const v = T.g[key];
@@ -176,6 +185,7 @@ function applyLang(){
   document.documentElement.lang = S.lang; document.title = T.title;
   $('#gameTitle').textContent = T.title;
   $$('[data-t]').forEach(e => e.textContent = T.ui[e.dataset.t]);
+  $('#installSteps').innerHTML = T.ui.installSteps.map(([who, how]) => `<li><b>${who}:</b> ${how}</li>`).join('');
   $$('[data-ta]').forEach(e => e.setAttribute('aria-label', T.ui[e.dataset.ta]));
   $('#name').placeholder = T.ui.namePh;
   $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang===S.lang));
@@ -451,6 +461,14 @@ $('#openBoard').onclick = () => {
 };
 $('#closeBoard').onclick = () => boardDlg.close();
 $('#levelChip').onclick = () => $('#openSettings').click();
+$('#installBtn').onclick = async () => {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  try { await installPrompt.userChoice; } catch {}
+  installPrompt = null; $('#installBtn').hidden = true;
+};
+showInstallState();
+matchMedia('(display-mode: fullscreen), (display-mode: standalone)').addEventListener?.('change', showInstallState);
 $('#langSeg').addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (!b) return; S.lang = b.dataset.lang; save(); applyLang(); });
 
 const dlg = $('#settings');
