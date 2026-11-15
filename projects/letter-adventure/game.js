@@ -34,20 +34,9 @@ const shown = s => s.replace(/\{([^}]*)n\}/g, (_, pre) => S.name ? pre + S.name 
 /* ---------- anonymous play counters (abacus.jasoncameron.dev) ---------- */
 const STATS = 'https://abacus.jasoncameron.dev', NS = 'sverrhag-letter-adventure';
 const live = location.protocol === 'https:' && !/^(localhost|127\.)/.test(location.hostname);
+// Counters: players, lang-sv, lang-en, game-alfabet, game-hitta, game-lyssna,
+// game-para, game-ord. They are only written here; the site's statistics page reads them.
 const hit = key => { if (live) fetch(`${STATS}/hit/${NS}/${key}`).catch(() => {}); };
-let statVals = null;
-async function loadStats(){
-  const keys = ['players', ...GAME_META.map(gm => 'game-' + gm.id)];
-  // A counter that has never been hit does not exist yet and counts as 0.
-  statVals = await Promise.all(keys.map(k => fetch(`${STATS}/get/${NS}/${k}`).then(r => r.ok ? r.json() : {value:0}).then(j => j.value || 0).catch(() => 0)));
-  renderStats();
-}
-function renderStats(){
-  if (!statVals || !statVals.some(Boolean)) return;
-  $('#stats').hidden = false;
-  $('#statsPlayers').textContent = T.ui.statsPlayers(statVals[0]);
-  $('#statsList').innerHTML = GAME_META.map((gm,i)=>`<li>${gm.em} <b>${T.games[i][0]}</b> – ${T.ui.statsTimes(statVals[i+1])}</li>`).join('');
-}
 
 /* ---------- phrases: {id, text} parts ---------- */
 function g(key){
@@ -131,7 +120,6 @@ function applyLang(){
   document.documentElement.lang = S.lang; document.title = T.title;
   $('#gameTitle').textContent = T.title;
   $$('[data-t]').forEach(e => e.textContent = T.ui[e.dataset.t]);
-  renderStats();
   $$('[data-ta]').forEach(e => e.setAttribute('aria-label', T.ui[e.dataset.ta]));
   $('#name').placeholder = T.ui.namePh;
   $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang===S.lang));
@@ -331,6 +319,5 @@ document.addEventListener('keydown', e => {
 });
 
 applyLang();
-loadStats();
 if (!S.name && matchMedia('(pointer:fine)').matches) $('#name').focus();
 })();

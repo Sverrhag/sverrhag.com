@@ -34,11 +34,19 @@ if (opt('list')) {
   const r = await fetch(`${API}/voices?languageCode=${opt('list')}`, { headers });
   if (!r.ok) { console.error(r.status, await r.text()); process.exit(1); }
   for (const v of (await r.json()).voices) console.log(v.name.padEnd(34), v.ssmlGender);
-  process.exit(0);
+}
+
+// Stay under the per-minute request quota: at most one request every 500 ms.
+let slot = 0;
+async function throttle() {
+  const now = Date.now();
+  slot = Math.max(slot + 500, now);
+  if (slot > now) await new Promise(s => setTimeout(s, slot - now));
 }
 
 async function synth(text, lang, voice) {
   for (let attempt = 0; ; attempt++) {
+    await throttle();
     const r = await fetch(`${API}/text:synthesize`, {
       method: 'POST', headers,
       body: JSON.stringify({
@@ -48,13 +56,13 @@ async function synth(text, lang, voice) {
       }),
     });
     if (r.ok) return Buffer.from((await r.json()).audioContent, 'base64');
-    if ((r.status === 429 || r.status >= 500) && attempt < 5) { await new Promise(s => setTimeout(s, 2000 * (attempt + 1))); continue; }
+    if ((r.status === 429 || r.status >= 500) && attempt < 8) { await new Promise(s => setTimeout(s, 20000)); continue; }
     throw new Error(`${r.status} ${await r.text()}`);
   }
 }
 
 let made = 0, kept = 0, chars = 0;
-for (const lang of Object.keys(LANGS)) {
+for (const lang of opt('list') ? [] : Object.keys(LANGS)) {
   if (opt('lang') && opt('lang') !== lang) continue;
   for (let vi = 0; vi < 5; vi++) {
     if (opt('voice') && +opt('voice') !== vi + 1) continue;
@@ -76,9 +84,10 @@ for (const lang of Object.keys(LANGS)) {
         writeFileSync(join(dir, id + '.mp3'), await synth(text, lang, voice));
         manifest[id] = `${voice.name}|${voice.rate ?? 1}|${text}`;
         made++; chars += text.length;
+        if (made % 20 === 0) writeFileSync(manifestPath, JSON.stringify(manifest, null, 1));
       }
     }));
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 1));
   }
 }
-console.log(`Recorded ${made} clips (${chars} characters), kept ${kept}.`);
+if (!opt('list')) console.log(`Recorded ${made} clips (${chars} characters), kept ${kept}.`);
