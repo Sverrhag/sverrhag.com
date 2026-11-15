@@ -88,8 +88,11 @@ function g(key){
   if (Array.isArray(v)){ const i = Math.floor(Math.random()*v.length); return {id:`${key}_${i}`, text:shown(v[i])}; }
   return {id:key, text:shown(v)};
 }
-const per = (key, L) => ({id:`${key}_${ALPHA.indexOf(L)}`, text:T.per[key](L)});
-const wordPart = (key, it) => ({id:`${key}_${it.wi}`, text:T.perWord[key](it.w.toLowerCase())});
+// The caption must not give away what the screen hides: the letter in the listening
+// game, and on the levels without visible letters, until the answer has been revealed.
+const secret = () => G && !G.revealed && (G.id==='lyssna' || (!LV().show && G.id!=='para'));
+const per = (key, L, open) => ({id:`${key}_${ALPHA.indexOf(L)}`, text:T.per[key](!open && secret() ? '?' : L)});
+const wordPart = (key, it) => ({id:`${key}_${it.wi}`, text:T.perWord[key](key==='word' && secret() ? '…' : it.w.toLowerCase())});
 
 /* ---------- voice: recorded clips ---------- */
 const player = new Audio();
@@ -257,7 +260,7 @@ function prompt(){
 
 function render(){
   const it = item(), card = $('#card'), ch = $('#choices'), id = G.id;
-  G.wrong = 0;
+  G.wrong = 0; G.revealed = false;
   card.className = ''; ch.innerHTML = ''; ch.hidden = true;
   $$('.hint').forEach(e=>e.classList.remove('hint'));
   const hide = !LV().show;
@@ -292,6 +295,7 @@ function reveal(){
   const t = target(), it = item();
   hint();
   if (LV().show) return;
+  G.revealed = true;
   if (G.id==='alfabet' || G.id==='hitta'){ const c = $('#card'); c.textContent = disp(t, it.c || (S.letterCase==='lower' ? 'lower' : 'upper')); c.classList.remove('tap'); }
   if (G.id==='ord'){ const s = $('#card .slot.now'); if (s) s.textContent = disp(t, it.c); }
 }
@@ -315,7 +319,7 @@ function press(k){
   const last = G.i === G.items.length-1;
   if (G.id==='alfabet'){
     if (last){ G.result = {ms: performance.now() - G.t0 + G.errs*PENALTY, errs: G.errs}; stopClock(); $('#timer').textContent = '⏱ ' + fmtTime(G.result.ms);
-      G.lock = true; $$('#progress .dot').forEach((d,i)=>{ d.className='dot done'; d.style.background=`var(${COLORS[i%6]})`; }); say([per('L',t), g('long')], win); return; }
+      G.lock = true; $$('#progress .dot').forEach((d,i)=>{ d.className='dot done'; d.style.background=`var(${COLORS[i%6]})`; }); say([per('L',t,true), g('long')], win); return; }
     G.i++; render(); say([g('short'), ...prompt()]); return;
   }
   if (G.id==='ord'){
