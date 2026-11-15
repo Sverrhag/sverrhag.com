@@ -1,0 +1,16 @@
+{
+  "sv": [
+    { "name": "sv-SE-Chirp3-HD-Aoede" },
+    { "name": "sv-SE-Chirp3-HD-Leda" },
+    { "name": "sv-SE-Chirp3-HD-Kore" },
+    { "name": "sv-SE-Chirp3-HD-Charon" },
+    { "name": "sv-SE-Chirp3-HD-Puck" }
+  ],
+  "en": [
+    { "name": "en-US-Chirp3-HD-Aoede" },
+    { "name": "en-US-Chirp3-HD-Leda" },
+    { "name": "en-US-Chirp3-HD-Kore" },
+    { "name": "en-US-Chirp3-HD-Charon" },
+    { "name": "en-US-Chirp3-HD-Puck" }
+  ]
+}
