@@ -8,7 +8,16 @@ const GAME_META = [
   {id:'lyssna',  em:'👂', c:'--r3'},
   {id:'para',    em:'🦋', c:'--r4'},
   {id:'ord',     em:'🦄', c:'--r6'},
+  // word games
+  {id:'bildord', em:'🖼️', c:'--r5'},
+  {id:'lasord',  em:'📖', c:'--r2'},
+  {id:'forsta',  em:'🔤', c:'--r3'},
+  {id:'saknad',  em:'🧩', c:'--r4'},
 ];
+const LETTER_GAMES = 5; // the first five are letter games, the rest word games
+const WORD_GAMES = ['bildord','lasord','forsta','saknad'];
+const WORD_ROUNDS = [0, 4, 5, 6, 8, 10];   // words per round on levels 1-5
+const WORD_MAXLEN = [0, 3, 4, 5, 6, 10];   // longest word on levels 1-5
 const VOICE_EM = ['🦄','🐞','🦉','🐻','🦊'];
 const STICKERS = [...'🦄🐞🌈⭐🌸🦋🍓🧁👑💖🐱🐶🍭🎀🌟🐰🍉🎈🐥🌻'];
 const cap = s => s[0].toUpperCase() + s.slice(1);
@@ -170,7 +179,9 @@ function applyLang(){
   $$('[data-ta]').forEach(e => e.setAttribute('aria-label', T.ui[e.dataset.ta]));
   $('#name').placeholder = T.ui.namePh;
   $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang===S.lang));
-  $('#games').innerHTML = GAME_META.map((gm,i)=>`<button class="game" data-g="${gm.id}" style="background:var(${gm.c})"><span class="num">${i+1}</span><span class="em">${gm.em}</span>${T.games[i][0]}<small>${T.games[i][1]}</small></button>`).join('');
+  const cards = GAME_META.map((gm,i)=>`<button class="game" data-g="${gm.id}" style="background:var(${gm.c})"><span class="num">${i+1}</span><span class="em">${gm.em}</span>${T.games[i][0]}<small>${T.games[i][1]}</small></button>`);
+  $('#games').innerHTML = cards.slice(0, LETTER_GAMES).join('');
+  $('#games2').innerHTML = cards.slice(LETTER_GAMES).join('');
   $('#aboutList').innerHTML = GAME_META.map((gm,i)=>`<li>${gm.em} <b>${T.games[i][0]}</b> – ${T.games[i][1]}</li>`).join('');
   $$('.voices').forEach(box => box.innerHTML = VOICE_EM.map((em,i)=>`<button class="voice" data-voice="${i}"><span>${em}</span>${T.voices[i]}</button>`).join(''));
   refresh();
@@ -204,12 +215,13 @@ function begin(){
   goHome(true);
 }
 
-$('#games').addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) startGame(b.dataset.g); });
+document.addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (b) startGame(b.dataset.g); });
 
+// Games answered by tapping a choice instead of typing.
+const usesChoices = () => G && (['lyssna','para','bildord','lasord'].includes(G.id) || (G.id==='forsta' && S.level<=3));
 function buildKb(){
   const kb = $('#kb');
-  const choiceGame = G && (G.id==='lyssna' || G.id==='para');
-  kb.hidden = !S.kb || choiceGame;
+  kb.hidden = !S.kb || usesChoices();
   const c = S.letterCase==='lower' ? 'lower' : 'upper';
   kb.innerHTML = T.kb.map(r => `<div class="kr">${[...r].map(L=>`<button class="key" data-k="${L}">${disp(L,c)}</button>`).join('')}</div>`).join('');
 }
@@ -233,13 +245,39 @@ function startGame(id){
     const [nShort, nMedium, nLong] = LV().words;
     const ws = [...(me ? [{w:me, e:'💖', isName:true}] : []), ...pool.filter(x=>x.w.length<=LV().short).slice(0, nShort), ...pool.filter(x=>x.w.length>=5).slice(0, nMedium), ...shuffle(all.slice(-T.finale)).slice(0, nLong)];
     G.items = ws.map(x=>({...x, c:pickCase()}));
+  } else if (WORD_GAMES.includes(id)){
+    const all = T.words.map(([w,e],wi)=>({w,e,wi}));
+    const pool = shuffle(all.filter(x => x.w.length <= WORD_MAXLEN[S.level]));
+    G.items = pool.slice(0, WORD_ROUNDS[S.level]).map(x => {
+      const it = {...x, c:pickCase()};
+      // Other words to choose between; from level 4 words with the same first letter come first.
+      const others = shuffle(all.filter(o => o.wi!==x.wi));
+      if (!LV().show) others.sort((a,b) => (b.w[0]===x.w[0]) - (a.w[0]===x.w[0]));
+      it.opts = shuffle([x, ...others.slice(0, LV().choices - 1)]);
+      it.letters = shuffle([x.w[0], ...shuffle(ALPHA.filter(l => l!==x.w[0])).slice(0, LV().choices - 1)]);
+      // Missing letters: the first one on levels 1-2, any one on level 3, two on levels 4-5.
+      const idx = shuffle([...x.w].map((_,i)=>i));
+      it.gaps = S.level<=2 ? [0] : idx.slice(0, S.level>=4 && x.w.length>=3 ? 2 : 1).sort((a,b)=>a-b);
+      return it;
+    });
   } else G.items = shuffle(ALPHA).slice(0, LV().rounds).map(L=>({L,c:pickCase()}));
   hit('game-' + id);
   show('game'); buildKb(); render();
   say([g('intro'+cap(id)), ...prompt()]);
 }
 const item = () => G.items[G.i];
-const target = () => G.id==='ord' ? item().w[G.pos] : item().L;
+function target(){
+  const it = item();
+  switch (G.id){
+    case 'ord': return it.w[G.pos];
+    case 'bildord': case 'lasord': return String(it.wi); // the choice buttons carry the word's index
+    case 'forsta': return it.w[0];
+    case 'saknad': return it.w[it.gaps[G.pos]];
+    default: return it.L;
+  }
+}
+// The word itself, spoken. On screen it is hidden where it would give the answer away.
+const sayWord = (it, open) => ({id:`say_${it.wi}`, text: open ? T.perWord.say(it.w.toLowerCase()) : '…'});
 const findKey = c => S.letterCase==='both' && c ? (c==='lower' ? 'findL' : 'findU') : 'find';
 
 function prompt(){
@@ -255,6 +293,11 @@ function prompt(){
     case 'ord':
       if (G.pos>0) return LV().say ? [per('next',L)] : [];
       return [it.isName ? g('nameStart') : wordPart('word',it), LV().say && per('start',L)];
+    // Word games: the voice reads the word aloud on the easier levels only.
+    case 'bildord': return [g('askBildord'), LV().say && sayWord(it)];
+    case 'lasord': return [g('askLasord'), LV().say && sayWord(it, true)];
+    case 'forsta': return [g('askForsta'), sayWord(it)];
+    case 'saknad': return G.pos>0 ? [] : [g('askSaknad'), LV().show && sayWord(it)];
   }
 }
 
@@ -278,12 +321,37 @@ function render(){
     card.classList.add('compact');
     card.innerHTML = `<span class="pic">${it.e}</span><div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${i<G.pos?'done':i===G.pos?'now':''}">${hide && i>=G.pos ? '' : disp(L,it.c)}</span>`).join('')}</div>`;
   }
+  const wordSlots = (cls, txt) => `<div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${cls(i)}">${txt(i) ? disp(L,it.c) : ''}</span>`).join('')}</div>`;
+  if (id==='bildord'){
+    card.classList.add('compact'); card.textContent = it.e;
+    ch.hidden = false;
+    ch.innerHTML = it.opts.map((o,i)=>`<button class="choice word" data-k="${o.wi}" style="background:var(${COLORS[(i*2+G.i)%6]})">${disp(o.w,it.c)}</button>`).join('');
+  }
+  if (id==='lasord'){
+    card.classList.add('compact','wordcard'); card.textContent = disp(it.w,it.c);
+    ch.hidden = false;
+    ch.innerHTML = it.opts.map((o,i)=>`<button class="choice" data-k="${o.wi}" style="background:var(${COLORS[(i*2+G.i)%6]})">${o.e}</button>`).join('');
+  }
+  if (id==='forsta'){
+    card.classList.add('compact');
+    // Level 1 shows the whole word under the picture; after that the child has to listen.
+    card.innerHTML = `<span class="pic">${it.e}</span>` + (S.level===1 ? wordSlots(i => i===0 ? 'now' : '', () => true) : '');
+    if (usesChoices()){
+      ch.hidden = false;
+      ch.innerHTML = it.letters.map((L,i)=>`<button class="choice" data-k="${L}" style="background:var(${COLORS[(i*2+G.i)%6]})">${disp(L,it.c)}</button>`).join('');
+    }
+  }
+  if (id==='saknad'){
+    card.classList.add('compact');
+    const gi = i => it.gaps.indexOf(i); // -1 for letters that are given
+    card.innerHTML = `<span class="pic">${it.e}</span>` + wordSlots(i => gi(i)<0 ? 'given' : gi(i)<G.pos ? 'done' : gi(i)===G.pos ? 'now' : '', i => gi(i)<0 || gi(i)<G.pos);
+  }
   card.classList.toggle('tap', card.textContent==='👂');
   const p = $('#progress');
   if (id==='alfabet') p.innerHTML = ALPHA.map((L,i)=>`<span class="dot ${i<G.i?'done':i===G.i?'now':''}" ${i<G.i?`style="background:var(${COLORS[i%6]})"`:''}>${hide && i>=G.i ? '' : disp(L,S.letterCase==='lower'?'lower':'upper')}</span>`).join('');
   else p.innerHTML = G.items.map((_,i)=>`<span class="pip ${i<G.i?'done':''}">${i<G.i?(i%2?'🦄':'🐞'):''}</span>`).join('');
   // On the easiest level the right key is lit from the start in the typing games.
-  if (LV().hintAt===0 && id!=='lyssna' && id!=='para') hint();
+  if (LV().hintAt===0 && ['alfabet','hitta','ord','saknad'].includes(id)) hint();
 }
 
 function hint(){
@@ -311,7 +379,10 @@ function press(k){
     if (helped) reveal();
     // Where the letter is hidden, the answer is only said aloud once it has been revealed.
     const tell = LV().show || helped || (G.id!=='alfabet' && G.id!=='ord');
-    say([g('wrong'), tell && per(G.id==='hitta' || G.id==='lyssna' ? findKey(it.c) : 'find', t)]);
+    let follow = tell && !WORD_GAMES.includes(G.id) && per(G.id==='hitta' || G.id==='lyssna' ? findKey(it.c) : 'find', t);
+    // In the word games the letter is only named once the help has appeared.
+    if ((G.id==='forsta' || G.id==='saknad') && helped) follow = per('find', t, true);
+    say([g('wrong'), follow]);
     return;
   }
   if (G.id==='alfabet' && !G.t0){ G.t0 = performance.now(); startClock(); }
@@ -328,10 +399,17 @@ function press(k){
     G.lock = true; render(); burst(16, $('#card'));
     say([it.isName ? g('wroteName') : wordPart('wrote',it), g('long')], () => advance(last)); return;
   }
+  if (G.id==='saknad'){
+    G.pos++;
+    if (G.pos < it.gaps.length){ render(); say(g('short')); return; }
+    G.lock = true; render(); burst(16, $('#card'));
+    say([sayWord(it, true), g('long')], () => advance(last)); return;
+  }
   G.lock = true;
   if (G.id==='lyssna') $('#card').textContent = disp(it.L,it.c);
   $$('#choices .choice').forEach(b => { if (b.dataset.k!==t) b.style.opacity = .25; });
-  say(g('long'), () => advance(last));
+  // After a right answer in a word game the voice says the word, so sound and spelling meet.
+  say([WORD_GAMES.includes(G.id) && sayWord(it, true), g('long')], () => advance(last));
 }
 function advance(last){
   if (!G) return;
@@ -404,7 +482,7 @@ document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || dlg.open || boardDlg.open) return;
   if (screen==='start'){ if (e.key==='Enter'){ e.preventDefault(); begin(); } return; }
   if (e.key==='Escape'){ if (screen!=='home') goHome(); return; }
-  if (screen==='home'){ const n = e.key.length===1 ? '12345'.indexOf(e.key) : -1; if (n>=0){ e.preventDefault(); startGame(GAME_META[n].id); } return; }
+  if (screen==='home'){ const n = e.key.length===1 ? '123456789'.indexOf(e.key) : -1; if (n>=0){ e.preventDefault(); startGame(GAME_META[n].id); } return; }
   if (screen==='win'){ if (e.key==='Enter' || e.key===' '){ e.preventDefault(); startGame(lastId); } return; }
   if (screen==='game'){
     if (e.key===' ' || e.key==='Enter'){ e.preventDefault(); repeat(); return; }
