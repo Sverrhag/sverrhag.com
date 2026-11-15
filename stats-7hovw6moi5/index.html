@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Project stats</title>
+<style>
+  @font-face {
+    font-family: "Marcellus SC";
+    src: url("../assets/fonts/marcellus-sc-latin-400-normal.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Manrope";
+    src: url("../assets/fonts/manrope-latin-400-normal.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Manrope";
+    src: url("../assets/fonts/manrope-latin-600-normal.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #17110c;
+    --bg-raised: #221a12;
+    --ink: #fbf1e2;
+    --ink-dim: #cdbca3;
+    --amber: #f5a72e;
+    --border: rgba(251, 241, 226, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: clamp(1.5rem, 5vw, 4rem);
+  }
+
+  h1 {
+    font-family: "Marcellus SC", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin: 0 0 0.3rem;
+  }
+
+  .sub {
+    color: var(--ink-dim);
+    margin: 0 0 2rem;
+    font-size: 0.95rem;
+  }
+
+  .refresh {
+    background: var(--bg-raised);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+  }
+
+  .refresh:hover { border-color: var(--amber); color: var(--amber); }
+  .refresh:disabled { opacity: 0.5; cursor: default; }
+
+  .panel {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    max-width: 640px;
+  }
+
+  .panel h2 {
+    font-family: "Marcellus SC", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+    margin: 0 0 1rem;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 0.45rem 0; font-size: 0.95rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  td.value {
+    text-align: right;
+    font-weight: 600;
+    color: var(--amber);
+    width: 5rem;
+    white-space: nowrap;
+  }
+  td.value.error { color: var(--ink-dim); font-weight: 400; font-style: italic; }
+
+  .empty { color: var(--ink-dim); font-style: italic; }
+  .updated { color: var(--ink-dim); font-size: 0.8rem; margin-top: -0.5rem; }
+</style>
+</head>
+<body>
+
+<h1>Project stats</h1>
+<p class="sub">
+  Not linked from the site, not password-protected — anyone with this URL (or the repo) can view it.
+  Counts come from <a href="https://abacus.jasoncameron.dev" style="color:inherit">Abacus</a>, a free public hit counter,
+  so the raw numbers are also readable there by anyone who knows a project's namespace/key.
+</p>
+<button class="refresh" id="refresh">Refresh</button>
+<p class="updated" id="updated"></p>
+
+<div id="panels"></div>
+
+<script src="../projects/projects.js"></script>
+<script>
+  const panels = document.getElementById("panels");
+  const refreshBtn = document.getElementById("refresh");
+  const updatedEl = document.getElementById("updated");
+  const projects = (window.PROJECTS || []).filter((p) => p.stats && p.stats.namespace);
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function fetchCount(namespace, key) {
+    try {
+      const res = await fetch(`https://abacus.jasoncameron.dev/get/${namespace}/${key}`);
+      if (res.status === 404) return { value: 0 };
+      if (!res.ok) return { error: true };
+      const data = await res.json();
+      return { value: typeof data.value === "number" ? data.value : 0 };
+    } catch (e) {
+      return { error: true };
+    }
+  }
+
+  function render() {
+    if (projects.length === 0) {
+      panels.innerHTML = `<p class="empty">No project declares a stats field yet.</p>`;
+      return;
+    }
+
+    panels.innerHTML = projects
+      .map(
+        (p) => `
+        <div class="panel" data-namespace="${p.stats.namespace}">
+          <h2>${p.title}</h2>
+          <table>
+            ${p.stats.counters
+              .map(
+                (c) => `
+                <tr data-key="${c.key}">
+                  <td>${c.label}</td>
+                  <td class="value">…</td>
+                </tr>`
+              )
+              .join("")}
+          </table>
+        </div>`
+      )
+      .join("");
+  }
+
+  async function loadAll() {
+    refreshBtn.disabled = true;
+    render();
+
+    for (const p of projects) {
+      const panel = panels.querySelector(`[data-namespace="${p.stats.namespace}"]`);
+      for (const c of p.stats.counters) {
+        const cell = panel.querySelector(`[data-key="${c.key}"] .value`);
+        const result = await fetchCount(p.stats.namespace, c.key);
+        if (result.error) {
+          cell.textContent = "—";
+          cell.classList.add("error");
+        } else {
+          cell.textContent = result.value;
+        }
+        await sleep(150); // stay well under Abacus's 30 req / 10s per IP limit
+      }
+    }
+
+    updatedEl.textContent = "Last updated " + new Date().toLocaleTimeString();
+    refreshBtn.disabled = false;
+  }
+
+  refreshBtn.addEventListener("click", loadAll);
+  loadAll();
+</script>
+</body>
+</html>
