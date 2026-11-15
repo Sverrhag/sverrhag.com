@@ -104,6 +104,18 @@ dialog .voice[aria-pressed="true"]{background:var(--card)}
 #prize{font-size:clamp(100px,28vh,240px); line-height:1; animation:pop .9s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes pop{from{transform:scale(0) rotate(-40deg)}}
 
+/* --- top list --- */
+.board{width:100%; max-width:420px; text-align:left}
+#result{background:var(--card); border-radius:26px; padding:12px 20px; box-shadow:0 5px 0 var(--line)}
+#yourTime{margin:0 0 6px; font-weight:700; font-size:20px; text-align:center}
+.board ol{margin:0; padding:0 0 0 1.6em; font-size:18px; line-height:1.5; font-variant-numeric:tabular-nums}
+.board li{padding:0 6px; border-radius:10px}
+.board li span{display:inline-block; min-width:9em; overflow-wrap:anywhere}
+.board li.me{background:var(--r3); color:var(--on-color); font-weight:700}
+#win.timed #prize{font-size:clamp(60px,12vh,110px)}
+#timer{background:var(--card); color:var(--ink)}
+#card.tap{cursor:pointer}
+
 /* --- home --- */
 .top{display:flex; gap:12px; align-items:center; flex:none}
 #home h1{font-size:clamp(28px,6vh,56px); flex:1; min-width:0; overflow-wrap:anywhere}
@@ -206,6 +218,7 @@ dialog .seg button{font-size:18px; padding:6px 14px}
   <div class="top">
     <h1 id="homeTitle"></h1>
     <span class="stars">⭐ <span class="starcount">0</span></span>
+    <button class="round" id="openBoard" data-ta="boardH">🏆</button>
     <button class="round" id="openSettings" data-ta="setH">⚙️</button>
   </div>
   <div class="top"><div class="bubble"><span class="who">🦄</span><span class="say"></span></div></div>
@@ -213,6 +226,9 @@ dialog .seg button{font-size:18px; padding:6px 14px}
   <div class="homebar">
     <div class="seg" id="caseSeg" role="group" data-ta="setLetters">
       <button data-case="upper">ABC</button><button data-case="lower">abc</button><button data-case="both">Aa</button>
+    </div>
+    <div class="seg" id="levelSeg" role="group" data-ta="ariaLevel">
+      <button data-level="easy" data-t="levelEasy"></button><button data-level="hard" data-t="levelHard"></button>
     </div>
   </div>
   <div class="shelf"><b id="shelfTitle"></b><div id="stickers"></div></div>
@@ -224,6 +240,7 @@ dialog .seg button{font-size:18px; padding:6px 14px}
     <button class="round" id="toHome" data-ta="ariaHome">🏠</button>
     <div class="bubble"><span class="who">🦄</span><span class="say"></span></div>
     <button class="round" id="again" data-ta="ariaAgain">🔊</button>
+    <span class="stars" id="timer" hidden>⏱ 0:00</span>
     <span class="stars">⭐ <span class="starcount">0</span></span>
   </div>
   <div class="stage"><div id="card"></div><div id="choices"></div></div>
@@ -235,6 +252,10 @@ dialog .seg button{font-size:18px; padding:6px 14px}
   <div id="prize">🦄</div>
   <h1 id="winTitle"></h1>
   <div class="bubble"><span class="who">🐞</span><span class="say"></span></div>
+  <div class="board" id="result" hidden>
+    <p id="yourTime"></p>
+    <ol id="winBoard"></ol>
+  </div>
   <div class="row"><button class="big" id="replay" data-t="replay"></button><button class="big alt" id="winHome" data-t="winHome"></button></div>
 </section>
 
@@ -253,6 +274,16 @@ dialog .seg button{font-size:18px; padding:6px 14px}
   <div class="opt"><label for="optKb" data-t="setKb"></label><input type="checkbox" id="optKb"></div>
   <div class="opt"><button class="pill" id="fullscreen" data-t="setFull"></button><button class="pill" id="reset" data-t="setReset"></button></div>
   <div class="opt"><button class="pill" id="changeName" data-t="setChange"></button><button class="big" id="closeSettings" style="font-size:20px" data-t="setDone"></button></div>
+</dialog>
+
+<dialog id="boardDlg">
+  <h2 id="boardTitle"></h2>
+  <div class="board">
+    <ol id="boardList"></ol>
+    <p class="note" id="boardEmpty" data-t="boardEmpty"></p>
+  </div>
+  <p class="note" data-t="boardNote"></p>
+  <div class="opt" style="justify-content:flex-end"><button class="big" id="closeBoard" style="font-size:20px" data-t="close"></button></div>
 </dialog>
 
 <script src="phrases.js"></script>

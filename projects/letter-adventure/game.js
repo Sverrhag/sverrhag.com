@@ -15,7 +15,7 @@ const cap = s => s[0].toUpperCase() + s.slice(1);
 
 /* ---------- state ---------- */
 const KEY = 'letter-adventure-v1';
-const S = {name:'', lang:(navigator.language||'').toLowerCase().startsWith('sv') ? 'sv' : 'en', letterCase:'upper', voice:true, voiceChar:0, speed:1, sfx:true, kb:true, stars:0, stickers:[]};
+const S = {name:'', lang:(navigator.language||'').toLowerCase().startsWith('sv') ? 'sv' : 'en', letterCase:'upper', voice:true, voiceChar:0, speed:1, sfx:true, kb:true, stars:0, stickers:[], hard:false, boards:{}};
 try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch {}
 if (!LANGS[S.lang]) S.lang = 'en';
 if (!VOICE_EM[S.voiceChar]) S.voiceChar = 0;
@@ -30,6 +30,31 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const nm = () => S.name || T.friend;
 // On screen the name marker "{, n}" becomes ", Moa"; with no name it disappears.
 const shown = s => s.replace(/\{([^}]*)n\}/g, (_, pre) => S.name ? pre + S.name : '');
+
+/* ---------- alphabet clock and top list (kept in this browser) ---------- */
+const PENALTY = 5000; // each mistake costs five seconds
+const boardKey = () => `${S.lang}-${S.hard ? 'hard' : 'easy'}`;
+const fmtTime = ms => { const t = Math.round(ms/100); return `${Math.floor(t/600)}:${String(Math.floor(t/10)%60).padStart(2,'0')}${T.dec}${t%10}`; };
+function fillBoard(ol, mark){
+  const list = S.boards[boardKey()] || [];
+  ol.innerHTML = '';
+  list.forEach(r => {
+    const li = document.createElement('li'), n = document.createElement('span'), t = document.createElement('b');
+    n.textContent = r.name; t.textContent = fmtTime(r.ms);
+    if (r.at === mark) li.className = 'me';
+    li.append(n, t); ol.append(li);
+  });
+  return list.length;
+}
+let clock = null;
+function stopClock(){ clearInterval(clock); clock = null; }
+function startClock(){
+  stopClock();
+  clock = setInterval(() => {
+    if (!G || !G.t0) return stopClock();
+    $('#timer').textContent = '⏱ ' + fmtTime(performance.now() - G.t0 + G.errs*PENALTY).slice(0, -2);
+  }, 250);
+}
 
 /* ---------- anonymous play counters (abacus.jasoncameron.dev) ---------- */
 const STATS = 'https://abacus.jasoncameron.dev', NS = 'sverrhag-letter-adventure';
@@ -136,6 +161,7 @@ function refresh(){
   $$('.starcount').forEach(e => e.textContent = S.stars);
   $$('[data-case]').forEach(b => b.setAttribute('aria-pressed', b.dataset.case===S.letterCase));
   $$('[data-voice]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.voice===S.voiceChar));
+  $$('[data-level]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.level==='hard')===S.hard));
   $$('.who').forEach(e => e.textContent = VOICE_EM[S.voiceChar]);
   const st = $('#stickers');
   st.classList.toggle('none', !S.stickers.length);
@@ -144,7 +170,7 @@ function refresh(){
   buildKb();
 }
 function goHome(first){
-  G = null; show('home'); refresh();
+  G = null; stopClock(); show('home'); refresh();
   say(g(first ? 'greet' : 'homeAgain'));
 }
 function begin(){
@@ -173,7 +199,9 @@ function nameWord(){
 }
 function startGame(id){
   lastId = id;
-  G = {id, i:0, pos:0, wrong:0, lock:false};
+  G = {id, i:0, pos:0, wrong:0, lock:false, errs:0, t0:0};
+  stopClock();
+  $('#timer').hidden = id!=='alfabet'; $('#timer').textContent = '⏱ 0:00';
   if (id==='alfabet') G.items = ALPHA.map(L=>({L}));
   else if (id==='ord'){
     const all = T.words.map(([w,e],wi)=>({w,e,wi}));
@@ -193,14 +221,15 @@ function prompt(){
   const it = item(), L = target();
   switch (G.id){
     case 'alfabet':
+      if (S.hard) return []; // the harder level never says which letter comes next
       if (G.i===0) return [per('start',L)];
       if (G.i===ALPHA.length-1) return [g('alphaLast')];
       return [per('next',L)];
     case 'hitta': case 'lyssna': return [per(findKey(it.c), L)];
     case 'para': return [per(it.c==='upper' ? 'pairU' : 'pairL', L)];
     case 'ord':
-      if (G.pos>0) return [per('next',L)];
-      return [it.isName ? g('nameStart') : wordPart('word',it), per('start',L)];
+      if (G.pos>0) return S.hard ? [] : [per('next',L)];
+      return [it.isName ? g('nameStart') : wordPart('word',it), !S.hard && per('start',L)];
   }
 }
 
@@ -209,28 +238,37 @@ function render(){
   G.wrong = 0;
   card.className = ''; ch.innerHTML = ''; ch.hidden = true;
   $$('.hint').forEach(e=>e.classList.remove('hint'));
-  if (id==='alfabet') card.textContent = S.letterCase==='both' ? it.L+' '+it.L.toLowerCase() : disp(it.L,S.letterCase);
-  if (id==='hitta') card.textContent = disp(it.L,it.c);
+  if (id==='alfabet') card.textContent = S.hard ? '?' : S.letterCase==='both' ? it.L+' '+it.L.toLowerCase() : disp(it.L,S.letterCase);
+  if (id==='hitta') card.textContent = S.hard ? '👂' : disp(it.L,it.c);
   if (id==='lyssna' || id==='para'){
     card.classList.add('compact');
     card.textContent = id==='lyssna' ? '👂' : disp(it.L,it.c);
-    it.opts = it.opts || shuffle([it.L, ...shuffle(ALPHA.filter(x=>x!==it.L)).slice(0,3)]);
+    it.opts = it.opts || shuffle([it.L, ...shuffle(ALPHA.filter(x=>x!==it.L)).slice(0, S.hard ? 5 : 3)]);
     const oc = id==='para' ? (it.c==='upper'?'lower':'upper') : it.c;
     ch.hidden = false;
     ch.innerHTML = it.opts.map((L,i)=>`<button class="choice" data-k="${L}" style="background:var(${COLORS[(i*2+G.i)%6]})">${disp(L,oc)}</button>`).join('');
   }
   if (id==='ord'){
     card.classList.add('compact');
-    card.innerHTML = `<span class="pic">${it.e}</span><div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${i<G.pos?'done':i===G.pos?'now':''}">${disp(L,it.c)}</span>`).join('')}</div>`;
+    card.innerHTML = `<span class="pic">${it.e}</span><div class="slots" style="--n:${it.w.length}">${[...it.w].map((L,i)=>`<span class="slot ${i<G.pos?'done':i===G.pos?'now':''}">${S.hard && i>=G.pos ? '' : disp(L,it.c)}</span>`).join('')}</div>`;
   }
+  card.classList.toggle('tap', card.textContent==='👂');
   const p = $('#progress');
-  if (id==='alfabet') p.innerHTML = ALPHA.map((L,i)=>`<span class="dot ${i<G.i?'done':i===G.i?'now':''}" ${i<G.i?`style="background:var(${COLORS[i%6]})"`:''}>${disp(L,S.letterCase==='lower'?'lower':'upper')}</span>`).join('');
+  if (id==='alfabet') p.innerHTML = ALPHA.map((L,i)=>`<span class="dot ${i<G.i?'done':i===G.i?'now':''}" ${i<G.i?`style="background:var(${COLORS[i%6]})"`:''}>${S.hard && i>=G.i ? '' : disp(L,S.letterCase==='lower'?'lower':'upper')}</span>`).join('');
   else p.innerHTML = G.items.map((_,i)=>`<span class="pip ${i<G.i?'done':''}">${i<G.i?(i%2?'🦄':'🐞'):''}</span>`).join('');
 }
 
 function hint(){
   const t = target();
   $$(`#kb [data-k="${t}"], #choices [data-k="${t}"]`).forEach(e=>e.classList.add('hint'));
+}
+// After two mistakes: light up the key, and on the harder level show the hidden letter.
+function reveal(){
+  const t = target(), it = item();
+  hint();
+  if (!S.hard) return;
+  if (G.id==='alfabet' || G.id==='hitta'){ const c = $('#card'); c.textContent = disp(t, it.c || (S.letterCase==='lower' ? 'lower' : 'upper')); c.classList.remove('tap'); }
+  if (G.id==='ord'){ const s = $('#card .slot.now'); if (s) s.textContent = disp(t, it.c); }
 }
 function flash(cls){ const c = $('#card'); c.classList.remove('yay','no'); void c.offsetWidth; c.classList.add(cls); }
 function showStars(){ $$('.starcount').forEach(e => e.textContent = S.stars); }
@@ -239,15 +277,19 @@ function press(k){
   if (screen!=='game' || !G || G.lock) return;
   const t = target(), it = item();
   if (k !== t){
-    G.wrong++; sfxNo(); flash('no');
-    if (G.wrong>=2) hint();
-    say([g('wrong'), per(G.id==='hitta' || G.id==='lyssna' ? findKey(it.c) : 'find', t)]);
+    G.wrong++; G.errs++; sfxNo(); flash('no');
+    if (G.wrong>=2) reveal();
+    // On the harder level the answer is only said aloud once it has been revealed.
+    const tell = !S.hard || G.wrong>=2 || (G.id!=='alfabet' && G.id!=='ord');
+    say([g('wrong'), tell && per(G.id==='hitta' || G.id==='lyssna' ? findKey(it.c) : 'find', t)]);
     return;
   }
+  if (G.id==='alfabet' && !G.t0){ G.t0 = performance.now(); startClock(); }
   S.stars++; save(); showStars(); sfxYes(); flash('yay'); burst(12, $('#card'));
   const last = G.i === G.items.length-1;
   if (G.id==='alfabet'){
-    if (last){ G.lock = true; $$('#progress .dot').forEach((d,i)=>{ d.className='dot done'; d.style.background=`var(${COLORS[i%6]})`; }); say([per('L',t), g('long')], win); return; }
+    if (last){ G.result = {ms: performance.now() - G.t0 + G.errs*PENALTY, errs: G.errs}; stopClock(); $('#timer').textContent = '⏱ ' + fmtTime(G.result.ms);
+      G.lock = true; $$('#progress .dot').forEach((d,i)=>{ d.className='dot done'; d.style.background=`var(${COLORS[i%6]})`; }); say([per('L',t), g('long')], win); return; }
     G.i++; render(); say([g('short'), ...prompt()]); return;
   }
   if (G.id==='ord'){
@@ -268,8 +310,17 @@ function advance(last){
 }
 function win(){
   if (!G) return;
-  const id = G.id; G = null;
-  const st = pick(STICKERS); S.stickers.push(st); S.stars += 5; save();
+  const id = G.id, res = G.result; G = null;
+  const st = pick(STICKERS); S.stickers.push(st); S.stars += 5;
+  $('#result').hidden = !res; $('#win').classList.toggle('timed', !!res);
+  if (res){
+    const mark = Date.now(), list = (S.boards[boardKey()] ||= []);
+    list.push({name: nm(), ms: Math.round(res.ms), errors: res.errs, at: mark});
+    list.sort((a,b) => a.ms - b.ms); list.splice(10);
+    $('#yourTime').textContent = T.ui.yourTime(fmtTime(res.ms), res.errs) + (list[0].at===mark ? ' ' + T.ui.newBest : '');
+    fillBoard($('#winBoard'), mark);
+  }
+  save();
   $('#prize').textContent = st;
   show('win'); refresh(); sfxWin(); rain(70);
   say([g('hurra'), g('win'+cap(id)), g('winTail')]);
@@ -281,16 +332,27 @@ $('#go').onclick = begin;
 $('#toHome').onclick = () => goHome();
 $('#winHome').onclick = () => goHome();
 $('#replay').onclick = () => startGame(lastId);
-$('#again').onclick = () => { if (G && !G.lock) say(prompt()); };
+const repeat = () => { if (!G || G.lock) return; const p = prompt().filter(Boolean); if (p.length) say(p); };
+$('#again').onclick = repeat;
+$('#card').onclick = () => { if ($('#card').classList.contains('tap')) repeat(); };
+const boardDlg = $('#boardDlg');
+$('#openBoard').onclick = () => {
+  $('#boardTitle').textContent = `${T.ui.boardH} (${S.hard ? T.ui.lvlHard : T.ui.lvlEasy})`;
+  $('#boardEmpty').hidden = fillBoard($('#boardList')) > 0;
+  boardDlg.showModal();
+};
+$('#closeBoard').onclick = () => boardDlg.close();
 $('#langSeg').addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (!b) return; S.lang = b.dataset.lang; save(); applyLang(); });
 
 const dlg = $('#settings');
 $('#openSettings').onclick = () => { refresh(); $('#fullscreen').hidden = !document.fullscreenEnabled; dlg.showModal(); };
 $('#closeSettings').onclick = () => dlg.close();
-$('#changeName').onclick = () => { dlg.close(); G = null; tok++; player.pause(); show('start'); };
+$('#changeName').onclick = () => { dlg.close(); G = null; stopClock(); tok++; player.pause(); show('start'); };
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-case]');
   if (c){ S.letterCase = c.dataset.case; save(); refresh(); if (!dlg.open) say(g('case'+cap(S.letterCase))); return; }
+  const lv = e.target.closest('[data-level]');
+  if (lv){ S.hard = lv.dataset.level==='hard'; save(); refresh(); say(g(S.hard ? 'modeHard' : 'modeEasy')); return; }
   const v = e.target.closest('[data-voice]');
   if (v){ S.voiceChar = +v.dataset.voice; save(); refresh(); say({id:'hello', text:T.hello[S.voiceChar]}); }
 });
@@ -306,13 +368,13 @@ $('#reset').onclick = e => {
 };
 
 document.addEventListener('keydown', e => {
-  if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || dlg.open) return;
+  if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || dlg.open || boardDlg.open) return;
   if (screen==='start'){ if (e.key==='Enter'){ e.preventDefault(); begin(); } return; }
   if (e.key==='Escape'){ if (screen!=='home') goHome(); return; }
   if (screen==='home'){ const n = e.key.length===1 ? '12345'.indexOf(e.key) : -1; if (n>=0){ e.preventDefault(); startGame(GAME_META[n].id); } return; }
   if (screen==='win'){ if (e.key==='Enter' || e.key===' '){ e.preventDefault(); startGame(lastId); } return; }
   if (screen==='game'){
-    if (e.key===' ' || e.key==='Enter'){ e.preventDefault(); if (G && !G.lock) say(prompt()); return; }
+    if (e.key===' ' || e.key==='Enter'){ e.preventDefault(); repeat(); return; }
     const k = e.key.toLocaleUpperCase(S.lang);
     if (k.length===1 && ALPHA.includes(k)){ e.preventDefault(); press(k); }
   }
