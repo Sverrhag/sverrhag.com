@@ -1,0 +1,80 @@
+{
+  "source": "Cloudflare zone analytics, read manually from the dashboard",
+  "snapshotAt": "2026-11-16T19:20:00Z",
+  "zones": [
+    {
+      "domain": "letteradventures.com",
+      "trackingSince": "2026-11-16",
+      "period": "Last 24 hours",
+      "metrics": [
+        { "label": "Visits", "value": "100" },
+        { "label": "Page views", "value": "99" },
+        { "label": "Requests", "value": "9.62k" },
+        { "label": "Data transfer", "value": "89.16 MB" }
+      ],
+      "tables": [
+        {
+          "title": "Play activity by language",
+          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs.",
+          "rows": [
+            { "label": "Swedish", "value": "4.71k" },
+            { "label": "English", "value": "3.48k" },
+            { "label": "Spanish", "value": "569" },
+            { "label": "German", "value": "9" },
+            { "label": "Portuguese", "value": "6" },
+            { "label": "French", "value": "2" }
+          ]
+        },
+        {
+          "title": "Landing pages",
+          "note": "Page views per address. / is not English only: it is where installed apps and returning players in any language start. The language pages went live on 2026-11-16 and are mostly reached from search engines.",
+          "rows": [
+            { "label": "/ (all languages)", "value": "88" },
+            { "label": "/sv/", "value": "4" },
+            { "label": "/de/", "value": "2" },
+            { "label": "/fr/", "value": "2" },
+            { "label": "/es/", "value": "1" },
+            { "label": "/pt/", "value": "1" },
+            { "label": "/privacy.html", "value": "3" }
+          ]
+        },
+        {
+          "title": "Page views by country",
+          "rows": [
+            { "label": "Sweden", "value": "33" },
+            { "label": "United States", "value": "31" },
+            { "label": "Canada", "value": "7" },
+            { "label": "Germany", "value": "5" },
+            { "label": "China", "value": "5" },
+            { "label": "Netherlands", "value": "3" },
+            { "label": "Thailand", "value": "3" },
+            { "label": "Singapore", "value": "2" },
+            { "label": "Tor", "value": "2" }
+          ]
+        },
+        {
+          "title": "Devices",
+          "rows": [
+            { "label": "Desktop", "value": "64" },
+            { "label": "Mobile", "value": "37" },
+            { "label": "Tablet", "value": "1" }
+          ]
+        },
+        {
+          "title": "Browsers",
+          "note": "Unknown/Others and curl are almost entirely crawlers, link previews and scripts, so roughly half of the page views are not people.",
+          "rows": [
+            { "label": "Unknown/Others", "value": "39" },
+            { "label": "Chrome", "value": "24" },
+            { "label": "Chrome Mobile", "value": "13" },
+            { "label": "Mobile Safari", "value": "13" },
+            { "label": "curl", "value": "8" },
+            { "label": "Firefox", "value": "2" },
+            { "label": "AppleBot", "value": "2" },
+            { "label": "Edge", "value": "1" }
+          ]
+        }
+      ]
+    }
+  ]
+}

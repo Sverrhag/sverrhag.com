@@ -106,6 +106,24 @@
   .empty { color: var(--ink-dim); font-style: italic; }
   .unavailable { color: var(--ink-dim); font-style: italic; margin: 0; }
   .updated { color: var(--ink-dim); font-size: 0.8rem; margin-top: -0.5rem; }
+
+  .section {
+    font-family: "Marcellus SC", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.15rem;
+    color: var(--ink-dim);
+    margin: 0 0 1rem;
+  }
+  .panel .meta { color: var(--ink-dim); font-size: 0.8rem; margin: -0.6rem 0 1rem; }
+  .panel h3 {
+    font-family: "Marcellus SC", Georgia, serif;
+    font-weight: 400;
+    font-size: 1rem;
+    color: var(--ink-dim);
+    margin: 1.25rem 0 0.25rem;
+  }
+  .note { color: var(--ink-dim); font-size: 0.8rem; margin: 1rem 0 0; }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -113,13 +131,22 @@
 <h1>Project stats</h1>
 <p class="sub">
   Not linked from the site, not password-protected — anyone with this URL (or the repo) can view it.
-  Counts come from <a href="https://abacus.jasoncameron.dev" style="color:inherit">Abacus</a>, a free public hit counter,
-  so the raw numbers are also readable there by anyone who knows a project's namespace/key.
+  Traffic numbers are a snapshot copied from Cloudflare's cookie-free zone analytics; they do not update live.
 </p>
-<button class="refresh" id="refresh">Refresh</button>
-<p class="updated" id="updated"></p>
 
-<div id="panels"></div>
+<h2 class="section">Traffic</h2>
+<div id="traffic"><p class="empty">Loading…</p></div>
+
+<div id="counters" hidden>
+  <h2 class="section">Counters</h2>
+  <p class="sub">
+    Counts come from <a href="https://abacus.jasoncameron.dev" style="color:inherit">Abacus</a>, a free public hit counter,
+    so the raw numbers are also readable there by anyone who knows a project's namespace/key.
+  </p>
+  <button class="refresh" id="refresh">Refresh</button>
+  <p class="updated" id="updated"></p>
+  <div id="panels"></div>
+</div>
 
 <script src="../projects/projects.js"></script>
 <script>
@@ -144,11 +171,47 @@
     }
   }
 
-  function render() {
-    if (projects.length === 0) {
-      panels.innerHTML = `<p class="empty">No project declares a stats field yet.</p>`;
-      return;
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  async function loadTraffic() {
+    const el = document.getElementById("traffic");
+    try {
+      const res = await fetch("cloudflare.json", { cache: "no-cache" });
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      const taken = new Date(data.snapshotAt).toLocaleString();
+      el.innerHTML = data.zones
+        .map(
+          (z) => `
+        <div class="panel">
+          <h2>${esc(z.domain)}</h2>
+          <p class="meta">${esc(z.period)} · snapshot taken ${esc(taken)} · tracking since ${esc(z.trackingSince)}</p>
+          <table>
+            ${z.metrics.map((m) => `<tr><td>${esc(m.label)}</td><td class="value">${esc(m.value)}</td></tr>`).join("")}
+          </table>
+          ${(z.tables || [])
+            .map(
+              (t) => `<h3>${esc(t.title)}</h3>
+          <table>
+            ${t.rows.map((r) => `<tr><td>${esc(r.label)}</td><td class="value">${esc(r.value)}</td></tr>`).join("")}
+          </table>
+          ${t.note ? `<p class="note">${esc(t.note)}</p>` : ""}`
+            )
+            .join("")}
+          <p class="note">All numbers include crawlers and other automated traffic.</p>
+        </div>`
+        )
+        .join("");
+    } catch (e) {
+      el.innerHTML = '<p class="unavailable">No traffic snapshot available.</p>';
     }
+  }
+
+  function render() {
+    if (projects.length === 0) return;
+    document.getElementById("counters").hidden = false;
 
     panels.innerHTML = projects
       .map(
@@ -172,6 +235,7 @@
   }
 
   async function loadAll() {
+    if (projects.length === 0) return;
     refreshBtn.disabled = true;
     render();
 
@@ -203,6 +267,7 @@
   }
 
   refreshBtn.addEventListener("click", loadAll);
+  loadTraffic();
   loadAll();
 </script>
 </body>
