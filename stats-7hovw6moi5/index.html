@@ -35,6 +35,7 @@
     --ink-dim: #cdbca3;
     --amber: #f5a72e;
     --border: rgba(251, 241, 226, 0.14);
+    --grid: rgba(251, 241, 226, 0.09);
   }
 
   * { box-sizing: border-box; }
@@ -43,7 +44,7 @@
     background: var(--bg);
     color: var(--ink);
     font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    padding: clamp(1.5rem, 5vw, 4rem);
+    padding: clamp(1rem, 5vw, 4rem);
   }
 
   h1 {
@@ -57,6 +58,7 @@
     color: var(--ink-dim);
     margin: 0 0 2rem;
     font-size: 0.95rem;
+    max-width: 760px;
   }
 
   .refresh {
@@ -81,7 +83,7 @@
     border-radius: 18px;
     padding: 1.5rem 1.75rem;
     margin-bottom: 1.5rem;
-    max-width: 640px;
+    max-width: 760px;
   }
 
   .panel h2 {
@@ -92,15 +94,16 @@
   }
 
   table { width: 100%; border-collapse: collapse; }
-  td { padding: 0.45rem 0; font-size: 0.95rem; border-bottom: 1px solid var(--border); }
+  td, th { padding: 0.45rem 0; font-size: 0.95rem; border-bottom: 1px solid var(--border); }
+  th { text-align: left; font-weight: 600; color: var(--ink-dim); font-size: 0.8rem; }
   tr:last-child td { border-bottom: none; }
-  td.value {
+  td.value, th.value {
     text-align: right;
-    font-weight: 600;
-    color: var(--amber);
     width: 5rem;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
+  td.value { font-weight: 600; color: var(--amber); }
   td.value.error { color: var(--ink-dim); font-weight: 400; font-style: italic; }
 
   .empty { color: var(--ink-dim); font-style: italic; }
@@ -120,10 +123,80 @@
     font-weight: 400;
     font-size: 1rem;
     color: var(--ink-dim);
-    margin: 1.25rem 0 0.25rem;
+    margin: 1.5rem 0 0.25rem;
   }
-  .note { color: var(--ink-dim); font-size: 0.8rem; margin: 1rem 0 0; }
+  .note { color: var(--ink-dim); font-size: 0.8rem; margin: 0.75rem 0 0; }
   [hidden] { display: none !important; }
+
+  /* ---------- Filters and charts ---------- */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-dim);
+  }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .seg button {
+    background: none;
+    border: 0;
+    color: var(--ink-dim);
+    font: inherit;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+  }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button[aria-pressed="true"] { background: rgba(245, 167, 46, 0.14); color: var(--ink); }
+  .seg button:focus-visible, .legend button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .chart { margin-top: 0.25rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 0.6rem; }
+  .legend button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.7rem 0.25rem 0.55rem;
+    cursor: pointer;
+  }
+  .legend button .swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .legend button[aria-pressed="false"] { color: var(--ink-dim); text-decoration: line-through; }
+  .legend button[aria-pressed="false"] .swatch { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--ink-dim); }
+
+  .plot { position: relative; }
+  .plot svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .plot text { font-family: inherit; font-size: 11px; fill: var(--ink-dim); }
+  .plot .direct { fill: var(--ink); font-size: 11.5px; }
+  .tip {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 2;
+  }
+  .tip strong { display: block; margin-bottom: 0.25rem; font-weight: 600; }
+  .tip div { display: flex; align-items: center; gap: 0.45rem; }
+  .tip .swatch { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .tip .v { margin-left: auto; padding-left: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  details { margin-top: 0.5rem; }
+  summary { cursor: pointer; color: var(--ink-dim); font-size: 0.8rem; }
+  details table { margin-top: 0.4rem; }
+  details td, details th { font-size: 0.8rem; padding: 0.3rem 0.5rem 0.3rem 0; }
+  details td.value, details th.value { width: auto; }
 </style>
 </head>
 <body>
@@ -136,6 +209,15 @@
 </p>
 
 <h2 class="section">Traffic</h2>
+<div class="filters" id="filters" hidden>
+  <span id="range-label">Charts show</span>
+  <div class="seg" role="group" aria-labelledby="range-label">
+    <button type="button" data-range="7" aria-pressed="false">7 days</button>
+    <button type="button" data-range="30" aria-pressed="true">30 days</button>
+    <button type="button" data-range="0" aria-pressed="false">All</button>
+  </div>
+  <span>Click a name above a chart to switch that line on or off.</span>
+</div>
 <div id="traffic"><p class="empty">Loading…</p></div>
 
 <div id="counters" hidden>
@@ -160,22 +242,242 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async function fetchCount(namespace, key) {
-    try {
-      const res = await fetch(`https://abacus.jasoncameron.dev/get/${namespace}/${key}`);
-      if (res.status === 404) return { value: 0 };
-      if (!res.ok) return { error: true };
-      const data = await res.json();
-      return { value: typeof data.value === "number" ? data.value : 0 };
-    } catch (e) {
-      return { error: true };
-    }
-  }
-
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
+  // ---------- Charts ----------
+  // Every chart reads the daily `history` list of a zone in cloudflare.json.
+  // Colours belong to the series, not to its position, so switching a line
+  // off never repaints the others. The palette is checked for colour-blind
+  // separation and contrast against the card background.
+  const SERIES = {
+    visits: { label: "Visits", color: "#3987e5" },
+    pageviews: { label: "Page views", color: "#d95926" },
+    sv: { label: "Swedish", color: "#3987e5" },
+    en: { label: "English", color: "#d95926" },
+    es: { label: "Spanish", color: "#199e70" },
+    de: { label: "German", color: "#c98500" },
+    pt: { label: "Portuguese", color: "#d55181" },
+    fr: { label: "French", color: "#0ca30c" },
+  };
+  const CHARTS = [
+    { id: "traffic", title: "Visits and page views per day", keys: ["visits", "pageviews"], get: (row, k) => row[k] },
+    {
+      id: "audio",
+      title: "Play activity by language per day",
+      keys: ["sv", "en", "es", "de", "pt", "fr"],
+      get: (row, k) => (row.audio ? row.audio[k] : undefined),
+    },
+  ];
+  const chartState = { range: 30, hidden: {}, redraw: [] };
+
+  const fmtFull = (n) => Number(n).toLocaleString("en-US");
+  const fmtAxis = (n) => (n >= 1000 ? (n / 1000).toFixed(n % 1000 ? 1 : 0) + "k" : String(n));
+  const fmtDate = (iso) =>
+    new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  const dayNumber = (iso) => Date.parse(iso + "T00:00:00Z") / 86400000;
+
+  function niceTicks(max) {
+    if (max <= 0) return [0, 1];
+    const rough = max / 4;
+    const pow = Math.pow(10, Math.floor(Math.log10(rough)));
+    const step = [1, 2, 2.5, 5, 10].map((m) => m * pow).find((s) => s >= rough);
+    const ticks = [];
+    for (let v = 0; v < max + step - 1e-9; v += step) ticks.push(Math.round(v * 100) / 100);
+    return ticks;
+  }
+
+  function chartMarkup(zoneIndex, chart) {
+    const key = zoneIndex + "-" + chart.id;
+    return `
+      <div class="chart" data-chart="${key}">
+        <h3>${esc(chart.title)}</h3>
+        <div class="legend">
+          ${chart.keys
+            .map(
+              (k) => `<button type="button" data-key="${k}" aria-pressed="true">
+                <span class="swatch" style="background:${SERIES[k].color}"></span>${esc(SERIES[k].label)}</button>`
+            )
+            .join("")}
+        </div>
+        <div class="plot"><svg role="img"></svg><div class="tip" hidden></div></div>
+        <p class="note" data-role="chart-note" hidden></p>
+        <details>
+          <summary>Show the numbers as a table</summary>
+          <div data-role="chart-table"></div>
+        </details>
+      </div>`;
+  }
+
+  function setupChart(el, history, chart) {
+    const key = el.dataset.chart;
+    const hidden = (chartState.hidden[key] = chartState.hidden[key] || new Set());
+    const svg = el.querySelector("svg");
+    const tip = el.querySelector(".tip");
+    const noteEl = el.querySelector('[data-role="chart-note"]');
+    const tableEl = el.querySelector('[data-role="chart-table"]');
+    const plot = el.querySelector(".plot");
+    let geometry = null;
+
+    function draw() {
+      const all = history.filter((row) => chart.keys.some((k) => chart.get(row, k) != null));
+      const lastDay = all.length ? dayNumber(all[all.length - 1].date) : 0;
+      const rows = chartState.range ? all.filter((r) => lastDay - dayNumber(r.date) < chartState.range) : all;
+      const visible = chart.keys.filter((k) => !hidden.has(k));
+
+      const W = Math.max(280, plot.clientWidth || 600);
+      const H = 230;
+      const directLabels = visible.length > 0 && visible.length <= 4 && W >= 420;
+      const m = { l: 40, r: directLabels ? 92 : 14, t: 12, b: 26 };
+      const iw = W - m.l - m.r;
+      const ih = H - m.t - m.b;
+
+      let max = 0;
+      rows.forEach((r) => visible.forEach((k) => (max = Math.max(max, chart.get(r, k) || 0))));
+      const ticks = niceTicks(max);
+      const top = ticks[ticks.length - 1];
+      const d0 = rows.length ? dayNumber(rows[0].date) : 0;
+      const span = rows.length > 1 ? dayNumber(rows[rows.length - 1].date) - d0 : 0;
+      const x = (r) => m.l + (span ? ((dayNumber(r.date) - d0) / span) * iw : iw / 2);
+      const y = (v) => m.t + ih - (v / top) * ih;
+
+      let out = "";
+      ticks.forEach((t) => {
+        out += `<line x1="${m.l}" x2="${m.l + iw}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)" stroke-width="1"/>`;
+        out += `<text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end">${fmtAxis(t)}</text>`;
+      });
+      const labelEvery = Math.max(1, Math.ceil(rows.length / Math.max(2, Math.floor(iw / 70))));
+      rows.forEach((r, i) => {
+        if (i % labelEvery === 0 || i === rows.length - 1) {
+          if (i !== rows.length - 1 && rows.length - 1 - i < labelEvery) return;
+          out += `<text x="${x(r)}" y="${H - 6}" text-anchor="middle">${fmtDate(r.date)}</text>`;
+        }
+      });
+      out += `<line data-role="cross" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="var(--ink-dim)" stroke-width="1" visibility="hidden"/>`;
+
+      const ends = [];
+      visible.forEach((k) => {
+        const pts = rows.filter((r) => chart.get(r, k) != null).map((r) => [x(r), y(chart.get(r, k))]);
+        if (!pts.length) return;
+        if (pts.length > 1) {
+          out += `<path d="M${pts.map((p) => p.join(",")).join("L")}" fill="none" stroke="${SERIES[k].color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+        }
+        if (pts.length <= 14) {
+          pts.forEach((p) => {
+            out += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${SERIES[k].color}" stroke="var(--bg-raised)" stroke-width="2"/>`;
+          });
+        }
+        ends.push({ k, x: pts[pts.length - 1][0], y: pts[pts.length - 1][1] });
+      });
+      if (directLabels) {
+        ends.sort((a, b) => a.y - b.y);
+        ends.forEach((e, i) => {
+          e.ly = i && e.y - ends[i - 1].ly < 14 ? ends[i - 1].ly + 14 : e.y;
+        });
+        ends.forEach((e) => {
+          out += `<text class="direct" x="${e.x + 10}" y="${e.ly + 4}">${esc(SERIES[e.k].label)}</text>`;
+        });
+      }
+
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      svg.setAttribute("aria-label", chart.title + ". The same numbers are in the table below the chart.");
+      svg.innerHTML = out;
+      geometry = { rows, visible, x, W, m, iw };
+      tip.hidden = true;
+
+      noteEl.hidden = false;
+      if (!visible.length) noteEl.textContent = "All lines are switched off. Click a name above to show it again.";
+      else if (rows.length < 2)
+        noteEl.textContent = "One daily snapshot so far, so there is only a dot. A line appears from the second day on.";
+      else noteEl.hidden = true;
+
+      tableEl.innerHTML = `<table>
+        <tr><th>Date</th>${chart.keys.map((k) => `<th class="value">${esc(SERIES[k].label)}</th>`).join("")}</tr>
+        ${rows
+          .slice()
+          .reverse()
+          .map(
+            (r) => `<tr><td>${esc(r.date)}</td>${chart.keys
+              .map((k) => `<td class="value">${chart.get(r, k) == null ? "—" : fmtFull(chart.get(r, k))}</td>`)
+              .join("")}</tr>`
+          )
+          .join("")}
+      </table>`;
+    }
+
+    function hover(evt) {
+      if (!geometry || !geometry.rows.length || !geometry.visible.length) return;
+      const box = svg.getBoundingClientRect();
+      const px = ((evt.clientX - box.left) / box.width) * geometry.W;
+      let best = geometry.rows[0];
+      geometry.rows.forEach((r) => {
+        if (Math.abs(geometry.x(r) - px) < Math.abs(geometry.x(best) - px)) best = r;
+      });
+      const cx = geometry.x(best);
+      const cross = svg.querySelector('[data-role="cross"]');
+      cross.setAttribute("x1", cx);
+      cross.setAttribute("x2", cx);
+      cross.setAttribute("visibility", "visible");
+      tip.innerHTML =
+        `<strong>${esc(fmtDate(best.date))}</strong>` +
+        geometry.visible
+          .map((k) => {
+            const v = chart.get(best, k);
+            return `<div><span class="swatch" style="background:${SERIES[k].color}"></span>${esc(SERIES[k].label)}<span class="v">${v == null ? "—" : fmtFull(v)}</span></div>`;
+          })
+          .join("");
+      tip.hidden = false;
+      const scale = box.width / geometry.W;
+      const left = cx * scale + 12;
+      tip.style.left = (left + tip.offsetWidth > box.width ? Math.max(0, cx * scale - 12 - tip.offsetWidth) : left) + "px";
+    }
+    function leave() {
+      tip.hidden = true;
+      const cross = svg.querySelector('[data-role="cross"]');
+      if (cross) cross.setAttribute("visibility", "hidden");
+    }
+    svg.addEventListener("pointermove", hover);
+    svg.addEventListener("pointerdown", hover);
+    svg.addEventListener("pointerleave", leave);
+
+    el.querySelectorAll(".legend button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const k = btn.dataset.key;
+        if (hidden.has(k)) hidden.delete(k);
+        else hidden.add(k);
+        btn.setAttribute("aria-pressed", String(!hidden.has(k)));
+        draw();
+      });
+    });
+
+    chartState.redraw.push(draw);
+    draw();
+
+    // Redraw at the new size when the card gets wider or narrower.
+    let lastWidth = plot.clientWidth;
+    new ResizeObserver(() => {
+      if (plot.clientWidth !== lastWidth) {
+        lastWidth = plot.clientWidth;
+        draw();
+      }
+    }).observe(plot);
+  }
+
+  document.querySelectorAll("#filters [data-range]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      chartState.range = Number(btn.dataset.range);
+      document
+        .querySelectorAll("#filters [data-range]")
+        .forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      chartState.redraw.forEach((fn) => fn());
+    });
+  });
+
+  // Fallback next to the per-chart ResizeObserver.
+  window.addEventListener("resize", () => chartState.redraw.forEach((fn) => fn()));
+
+  // ---------- Traffic panels ----------
   async function loadTraffic() {
     const el = document.getElementById("traffic");
     try {
@@ -183,9 +485,12 @@
       if (!res.ok) throw new Error(res.status);
       const data = await res.json();
       const taken = new Date(data.snapshotAt).toLocaleString();
+      const chartsFor = (z) =>
+        CHARTS.filter((c) => (z.history || []).some((row) => c.keys.some((k) => c.get(row, k) != null)));
+
       el.innerHTML = data.zones
         .map(
-          (z) => `
+          (z, zi) => `
         <div class="panel">
           <h2>${esc(z.domain)}</h2>
           <p class="meta">${esc(z.period)} · snapshot taken ${esc(taken)} · tracking since ${esc(z.trackingSince)}</p>
@@ -198,6 +503,9 @@
               : `<p class="unavailable">No numbers yet.</p>`
           }
           ${z.note ? `<p class="note">${esc(z.note)}</p>` : ""}
+          ${chartsFor(z)
+            .map((c) => chartMarkup(zi, c))
+            .join("")}
           ${(z.tables || [])
             .map(
               (t) => `<h3>${esc(t.title)}</h3>
@@ -210,8 +518,29 @@
         </div>`
         )
         .join("");
+
+      chartState.redraw = [];
+      data.zones.forEach((z, zi) => {
+        chartsFor(z).forEach((c) => {
+          setupChart(el.querySelector(`[data-chart="${zi}-${c.id}"]`), z.history, c);
+        });
+      });
+      document.getElementById("filters").hidden = chartState.redraw.length === 0;
     } catch (e) {
       el.innerHTML = '<p class="unavailable">No traffic snapshot available.</p>';
+    }
+  }
+
+  // ---------- Abacus counters (only shown when a project declares `stats`) ----------
+  async function fetchCount(namespace, key) {
+    try {
+      const res = await fetch(`https://abacus.jasoncameron.dev/get/${namespace}/${key}`);
+      if (res.status === 404) return { value: 0 };
+      if (!res.ok) return { error: true };
+      const data = await res.json();
+      return { value: typeof data.value === "number" ? data.value : 0 };
+    } catch (e) {
+      return { error: true };
     }
   }
 
