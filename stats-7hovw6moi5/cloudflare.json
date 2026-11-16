@@ -190,12 +190,12 @@
     },
     {
       "domain": "sverrhag.com",
-      "sourceLabel": "Cloudflare Web Analytics (script on the start page; counts browsers that run JavaScript)",
+      "sourceLabel": "Cloudflare Web Analytics (script on the start page and in the chess project; counts browsers that run JavaScript)",
       "trackingSince": "2026-11-16",
       "period": "Last 24 hours",
       "metrics": [],
       "tables": [],
-      "note": "Counting started on 2026-11-16. The first numbers appear at the next snapshot. Only the start page is counted; the chess project under /projects/chess/ is not. Visitors with ad blockers are not counted."
+      "note": "Counts the start page and the chess project under /projects/chess/, starting 2026-11-16. The first numbers appear at the next snapshot. Visitors with ad blockers, Do Not Track or Global Privacy Control are not counted in the chess project."
     }
   ]
 }
