@@ -43,6 +43,9 @@
 
   <section id="projects" class="projects">
     <h2>Projects</h2>
+    <!-- Filled in by assets/js/main.js. The deploy workflow also writes the
+         same cards in here as plain HTML (tools/prerender.mjs), so crawlers
+         that don't run JavaScript see them. Keep this element on one line. -->
     <div class="projects-grid" id="projects-grid"></div>
   </section>
 </main>
@@ -58,6 +61,7 @@
 </footer>
 
 <script src="projects/projects.js" defer></script>
+<script src="assets/js/render-projects.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 <!-- Cloudflare Web Analytics: cookie-free visit counts, shown on the stats page -->
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "e7414e4786ca4a1da53926d6ed2bc90a"}'></script>
