@@ -1,6 +1,6 @@
 {
   "source": "Cloudflare, read manually from the dashboard",
-  "snapshotAt": "2026-11-16T20:15:00Z",
+  "snapshotAt": "2026-11-16T21:45:00Z",
   "zones": [
     {
       "domain": "letteradventures.com",
@@ -9,25 +9,25 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "110"
+          "value": "245"
         },
         {
           "label": "Page views",
-          "value": "120"
+          "value": "257"
         },
         {
           "label": "Requests",
-          "value": "9.72k"
+          "value": "11.01k"
         },
         {
           "label": "Data transfer",
-          "value": "91.63 MB"
+          "value": "107.74 MB"
         }
       ],
       "tables": [
         {
           "title": "Play activity by language",
-          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (68 requests across all languages in this period) are included and can land under a language other than the one played.",
+          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (71 requests across all languages in this period) are included and can land under a language other than the one played.",
           "rows": [
             {
               "label": "Swedish",
@@ -57,35 +57,35 @@
         },
         {
           "title": "Landing pages",
-          "note": "Page views per address. / is not English only: it is where installed apps and returning players in any language start. The language pages went live on 2026-11-16 and are mostly reached from search engines.",
+          "note": "Page views grouped by the first part of the address, from Cloudflare's list of top paths, so small pages can be missing. / is not English only: it is where installed apps and returning players in any language start. /en/… pages also keep the visitor's last language.",
           "rows": [
             {
-              "label": "/ (all languages)",
-              "value": "98"
+              "label": "/ (start page, all languages)",
+              "value": "129"
             },
             {
-              "label": "/sv/",
+              "label": "/en/… (game pages)",
+              "value": "9"
+            },
+            {
+              "label": "/sv/…",
+              "value": "8"
+            },
+            {
+              "label": "/de/…",
+              "value": "7"
+            },
+            {
+              "label": "/fr/…",
               "value": "5"
             },
             {
-              "label": "/de/",
-              "value": "5"
-            },
-            {
-              "label": "/es/",
-              "value": "3"
-            },
-            {
-              "label": "/fr/",
-              "value": "2"
-            },
-            {
-              "label": "/pt/",
-              "value": "1"
+              "label": "/es/…",
+              "value": "4"
             },
             {
               "label": "/privacy.html",
-              "value": "5"
+              "value": "7"
             }
           ]
         },
@@ -93,19 +93,31 @@
           "title": "Page views by country",
           "rows": [
             {
+              "label": "Russian Federation",
+              "value": "82"
+            },
+            {
               "label": "Sweden",
-              "value": "44"
+              "value": "62"
             },
             {
               "label": "United States",
-              "value": "32"
+              "value": "48"
             },
             {
               "label": "Canada",
-              "value": "7"
+              "value": "8"
+            },
+            {
+              "label": "Netherlands",
+              "value": "8"
             },
             {
               "label": "Germany",
+              "value": "8"
+            },
+            {
+              "label": "Singapore",
               "value": "7"
             },
             {
@@ -115,18 +127,6 @@
             {
               "label": "China",
               "value": "5"
-            },
-            {
-              "label": "Netherlands",
-              "value": "3"
-            },
-            {
-              "label": "Thailand",
-              "value": "3"
-            },
-            {
-              "label": "Russian Federation",
-              "value": "2"
             }
           ]
         },
@@ -135,11 +135,11 @@
           "rows": [
             {
               "label": "Desktop",
-              "value": "83"
+              "value": "202"
             },
             {
               "label": "Mobile",
-              "value": "37"
+              "value": "54"
             },
             {
               "label": "Tablet",
@@ -149,35 +149,35 @@
         },
         {
           "title": "Browsers",
-          "note": "Unknown/Others and curl are almost entirely crawlers, link previews and scripts, so roughly half of the page views are not people.",
+          "note": "YandexBot, Unknown/Others and curl are almost entirely crawlers, link previews and scripts, so a large share of the page views are not people.",
           "rows": [
             {
-              "label": "Unknown/Others",
-              "value": "44"
+              "label": "YandexBot",
+              "value": "86"
             },
             {
-              "label": "Chrome",
-              "value": "25"
+              "label": "Unknown/Others",
+              "value": "59"
             },
             {
               "label": "curl",
-              "value": "15"
+              "value": "33"
+            },
+            {
+              "label": "Chrome",
+              "value": "31"
+            },
+            {
+              "label": "Mobile Safari",
+              "value": "24"
             },
             {
               "label": "Chrome Mobile",
               "value": "13"
             },
             {
-              "label": "Mobile Safari",
-              "value": "13"
-            },
-            {
               "label": "Firefox",
-              "value": "4"
-            },
-            {
-              "label": "YandexBot",
-              "value": "3"
+              "value": "5"
             },
             {
               "label": "AppleBot",
@@ -194,9 +194,9 @@
       "history": [
         {
           "date": "2026-11-16",
-          "visits": 110,
-          "pageviews": 120,
-          "requests": 9720,
+          "visits": 245,
+          "pageviews": 257,
+          "requests": 11010,
           "audio": {
             "sv": 4710,
             "en": 3480,
@@ -216,20 +216,20 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "4"
+          "value": "5"
         },
         {
           "label": "Page views",
-          "value": "4"
+          "value": "5"
         }
       ],
       "tables": [],
-      "note": "Counts the start page and the chess project under /projects/chess/, starting 2026-11-16. So far the visits are our own checks after setting it up. Visitors with ad blockers are not counted; the chess project also honours Do Not Track and Global Privacy Control.",
+      "note": "Counts the start page and the chess project under /projects/chess/. Visitors with ad blockers are not counted; the chess project also honours Do Not Track and Global Privacy Control.",
       "history": [
         {
           "date": "2026-11-16",
-          "visits": 4,
-          "pageviews": 4
+          "visits": 5,
+          "pageviews": 5
         }
       ]
     }
