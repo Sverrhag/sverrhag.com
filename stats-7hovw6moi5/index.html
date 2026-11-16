@@ -131,7 +131,8 @@
 <h1>Project stats</h1>
 <p class="sub">
   Not linked from the site, not password-protected — anyone with this URL (or the repo) can view it.
-  Traffic numbers are a snapshot copied from Cloudflare's cookie-free zone analytics; they do not update live.
+  Traffic numbers are a snapshot copied from Cloudflare's cookie-free analytics, refreshed about once a day; they do not update live.
+  Each panel names its source, because the two sources count differently.
 </p>
 
 <h2 class="section">Traffic</h2>
@@ -188,9 +189,15 @@
         <div class="panel">
           <h2>${esc(z.domain)}</h2>
           <p class="meta">${esc(z.period)} · snapshot taken ${esc(taken)} · tracking since ${esc(z.trackingSince)}</p>
-          <table>
+          ${z.sourceLabel ? `<p class="meta">Source: ${esc(z.sourceLabel)}</p>` : ""}
+          ${
+            z.metrics && z.metrics.length
+              ? `<table>
             ${z.metrics.map((m) => `<tr><td>${esc(m.label)}</td><td class="value">${esc(m.value)}</td></tr>`).join("")}
-          </table>
+          </table>`
+              : `<p class="unavailable">No numbers yet.</p>`
+          }
+          ${z.note ? `<p class="note">${esc(z.note)}</p>` : ""}
           ${(z.tables || [])
             .map(
               (t) => `<h3>${esc(t.title)}</h3>
@@ -200,7 +207,6 @@
           ${t.note ? `<p class="note">${esc(t.note)}</p>` : ""}`
             )
             .join("")}
-          <p class="note">All numbers include crawlers and other automated traffic.</p>
         </div>`
         )
         .join("");
