@@ -20,10 +20,21 @@ window.PROJECTS = [
   {
     title: "Letter Adventures",
     description:
-      "A playful letter and word game for children ages 3 to 7. Nine games across five difficulty levels: type the alphabet, find letters, match big and small, spell words, match pictures to words, read words, find the first letter, and spot a missing one — guided by cheerful recorded voices with unicorns and ladybugs. In English, Spanish, French, Portuguese, German and Swedish.",
+      "A free alphabet and letter game for children. Nine games across five difficulty levels: type the alphabet, find letters, match big and small, spell words, match pictures to words, read words, find the first letter, and spot a missing one — guided by cheerful recorded voices with unicorns and ladybugs. In English, Spanish, French, Portuguese, German and Swedish.",
     url: "https://letteradventures.com/",
     tags: ["Kids", "Game", "6 languages"],
     thumbnail: "assets/img/projects/letter-adventure.jpg",
+    // Optional row of plain links under the card (here: one per language
+    // page, so search engines find each of them).
+    linksLabel: "Play in your language:",
+    links: [
+      { label: "English", lang: "en", url: "https://letteradventures.com/" },
+      { label: "Español", lang: "es", url: "https://letteradventures.com/es/" },
+      { label: "Français", lang: "fr", url: "https://letteradventures.com/fr/" },
+      { label: "Português", lang: "pt", url: "https://letteradventures.com/pt/" },
+      { label: "Deutsch", lang: "de", url: "https://letteradventures.com/de/" },
+      { label: "Svenska", lang: "sv", url: "https://letteradventures.com/sv/" },
+    ],
     // No stats field: the game no longer calls any third-party counter
     // (removed for GDPR/consent reasons around child visitors' IPs). The
     // sverrhag-letter-adventure namespace gets no further hits.

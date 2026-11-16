@@ -368,6 +368,34 @@ body {
   padding: 0.25rem 0.65rem;
 }
 
+.project-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.project-card .project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.9rem;
+  margin-top: 0.4rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.project-card .project-links span { flex-basis: 100%; }
+
+.project-card .project-links a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--amber);
+  text-underline-offset: 0.2em;
+}
+
+.project-card .project-links a:hover { color: var(--amber); }
+
 .projects-empty {
   grid-column: 1 / -1;
   border: 1.5px dashed var(--border);

@@ -44,8 +44,28 @@ if (projects.length === 0) {
             /^https?:\/\//.test(p.url) ? ' target="_blank" rel="noopener"' : ""
           }`
         : "";
+      // A card with extra links can't be one big <a> (links can't nest), so
+      // the card becomes a <div> holding the main link plus a row of links.
+      const hasLinks = p.url && p.links && p.links.length;
+      const outerOpen = hasLinks
+        ? `<div class="project-card has-links"><a class="project-card-main"${linkAttrs}>`
+        : `<${tag} class="project-card"${linkAttrs}>`;
+      const outerClose = hasLinks
+        ? `</a>
+        <p class="project-links">
+          ${p.linksLabel ? `<span>${p.linksLabel}</span>` : ""}
+          ${p.links
+            .map(
+              (l) =>
+                `<a href="${l.url}"${l.lang ? ` hreflang="${l.lang}" lang="${l.lang}"` : ""}${
+                  /^https?:\/\//.test(l.url) ? ' target="_blank" rel="noopener"' : ""
+                }>${l.label}</a>`
+            )
+            .join(" ")}
+        </p></div>`
+        : `</${tag}>`;
       return `
-      <${tag} class="project-card"${linkAttrs}>
+      ${outerOpen}
         ${
           p.thumbnail
             ? `<div class="project-thumb">
@@ -65,7 +85,7 @@ if (projects.length === 0) {
                 .join("")}</div>`
             : ""
         }
-      </${tag}>`;
+      ${outerClose}`;
     })
     .join("");
 }
