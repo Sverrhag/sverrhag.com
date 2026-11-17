@@ -1,6 +1,6 @@
 {
   "source": "Cloudflare, read manually from the dashboard",
-  "snapshotAt": "2026-11-16T21:45:00Z",
+  "snapshotAt": "2026-11-17T04:18:00Z",
   "zones": [
     {
       "domain": "letteradventures.com",
@@ -9,33 +9,33 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "245"
+          "value": "383"
         },
         {
           "label": "Page views",
-          "value": "257"
+          "value": "400"
         },
         {
           "label": "Requests",
-          "value": "11.01k"
+          "value": "11.99k"
         },
         {
           "label": "Data transfer",
-          "value": "107.74 MB"
+          "value": "117.46 MB"
         }
       ],
       "tables": [
         {
           "title": "Play activity by language",
-          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (71 requests across all languages in this period) are included and can land under a language other than the one played.",
+          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (73 requests across all languages in this period) are included and can land under a language other than the one played.",
           "rows": [
             {
               "label": "Swedish",
-              "value": "4.71k"
+              "value": "4.72k"
             },
             {
               "label": "English",
-              "value": "3.48k"
+              "value": "4.02k"
             },
             {
               "label": "Spanish",
@@ -61,31 +61,27 @@
           "rows": [
             {
               "label": "/ (start page, all languages)",
-              "value": "129"
-            },
-            {
-              "label": "/en/… (game pages)",
-              "value": "9"
+              "value": "178"
             },
             {
               "label": "/sv/…",
-              "value": "8"
+              "value": "21"
+            },
+            {
+              "label": "/en/… (game pages)",
+              "value": "17"
             },
             {
               "label": "/de/…",
-              "value": "7"
+              "value": "9"
             },
             {
               "label": "/fr/…",
-              "value": "5"
-            },
-            {
-              "label": "/es/…",
-              "value": "4"
+              "value": "7"
             },
             {
               "label": "/privacy.html",
-              "value": "7"
+              "value": "9"
             }
           ]
         },
@@ -94,39 +90,39 @@
           "rows": [
             {
               "label": "Russian Federation",
-              "value": "82"
-            },
-            {
-              "label": "Sweden",
-              "value": "62"
+              "value": "128"
             },
             {
               "label": "United States",
-              "value": "48"
+              "value": "89"
             },
             {
-              "label": "Canada",
-              "value": "8"
-            },
-            {
-              "label": "Netherlands",
-              "value": "8"
+              "label": "Sweden",
+              "value": "80"
             },
             {
               "label": "Germany",
-              "value": "8"
+              "value": "14"
             },
             {
               "label": "Singapore",
-              "value": "7"
+              "value": "10"
+            },
+            {
+              "label": "Canada",
+              "value": "10"
+            },
+            {
+              "label": "Netherlands",
+              "value": "10"
+            },
+            {
+              "label": "South Korea",
+              "value": "8"
             },
             {
               "label": "Finland",
               "value": "6"
-            },
-            {
-              "label": "China",
-              "value": "5"
             }
           ]
         },
@@ -135,11 +131,11 @@
           "rows": [
             {
               "label": "Desktop",
-              "value": "202"
+              "value": "293"
             },
             {
               "label": "Mobile",
-              "value": "54"
+              "value": "106"
             },
             {
               "label": "Tablet",
@@ -153,27 +149,27 @@
           "rows": [
             {
               "label": "YandexBot",
-              "value": "86"
+              "value": "132"
             },
             {
               "label": "Unknown/Others",
-              "value": "59"
-            },
-            {
-              "label": "curl",
-              "value": "33"
-            },
-            {
-              "label": "Chrome",
-              "value": "31"
+              "value": "76"
             },
             {
               "label": "Mobile Safari",
-              "value": "24"
+              "value": "69"
+            },
+            {
+              "label": "curl",
+              "value": "48"
+            },
+            {
+              "label": "Chrome",
+              "value": "45"
             },
             {
               "label": "Chrome Mobile",
-              "value": "13"
+              "value": "18"
             },
             {
               "label": "Firefox",
@@ -182,10 +178,6 @@
             {
               "label": "AppleBot",
               "value": "2"
-            },
-            {
-              "label": "Edge",
-              "value": "1"
             }
           ]
         }
@@ -205,6 +197,20 @@
             "pt": 8,
             "fr": 4
           }
+        },
+        {
+          "date": "2026-11-17",
+          "visits": 383,
+          "pageviews": 400,
+          "requests": 11990,
+          "audio": {
+            "sv": 4720,
+            "en": 4020,
+            "es": 571,
+            "de": 11,
+            "pt": 8,
+            "fr": 4
+          }
         }
       ]
     },
@@ -216,11 +222,11 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "5"
+          "value": "7"
         },
         {
           "label": "Page views",
-          "value": "5"
+          "value": "7"
         }
       ],
       "tables": [],
@@ -230,6 +236,11 @@
           "date": "2026-11-16",
           "visits": 5,
           "pageviews": 5
+        },
+        {
+          "date": "2026-11-17",
+          "visits": 7,
+          "pageviews": 7
         }
       ]
     }
