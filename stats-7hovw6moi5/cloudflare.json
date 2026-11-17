@@ -1,6 +1,6 @@
 {
   "source": "Cloudflare, read manually from the dashboard",
-  "snapshotAt": "2026-11-17T04:18:00Z",
+  "snapshotAt": "2026-11-17T05:40:00Z",
   "zones": [
     {
       "domain": "letteradventures.com",
@@ -222,14 +222,93 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "7"
+          "value": "9"
         },
         {
           "label": "Page views",
-          "value": "7"
+          "value": "10"
+        },
+        {
+          "label": "Best Move Chess page views",
+          "value": "2"
         }
       ],
-      "tables": [],
+      "tables": [
+        {
+          "title": "Pages",
+          "note": "Page views per page. Everything under /projects/chess/ is counted as Best Move Chess.",
+          "rows": [
+            {
+              "label": "/ (start page)",
+              "value": "8"
+            },
+            {
+              "label": "/projects/chess/ (Best Move Chess)",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "title": "Page views by country",
+          "rows": [
+            {
+              "label": "Sweden",
+              "value": "8"
+            },
+            {
+              "label": "Finland",
+              "value": "1"
+            },
+            {
+              "label": "China",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "title": "Referrers",
+          "rows": [
+            {
+              "label": "None (direct)",
+              "value": "9"
+            },
+            {
+              "label": "sverrhag.com",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "title": "Devices",
+          "rows": [
+            {
+              "label": "Mobile",
+              "value": "5"
+            },
+            {
+              "label": "Desktop",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "title": "Browsers",
+          "rows": [
+            {
+              "label": "Chrome",
+              "value": "4"
+            },
+            {
+              "label": "Unknown",
+              "value": "4"
+            },
+            {
+              "label": "Chrome Mobile",
+              "value": "2"
+            }
+          ]
+        }
+      ],
       "note": "Counts the start page and the chess project under /projects/chess/. Visitors with ad blockers are not counted; the chess project also honours Do Not Track and Global Privacy Control.",
       "history": [
         {
@@ -239,8 +318,12 @@
         },
         {
           "date": "2026-11-17",
-          "visits": 7,
-          "pageviews": 7
+          "visits": 9,
+          "pageviews": 10,
+          "pages": {
+            "chess": 2,
+            "home": 8
+          }
         }
       ]
     }

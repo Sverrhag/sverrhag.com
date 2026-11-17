@@ -260,6 +260,8 @@
     de: { label: "German", color: "#c98500" },
     pt: { label: "Portuguese", color: "#d55181" },
     fr: { label: "French", color: "#0ca30c" },
+    chess: { label: "Best Move Chess", color: "#199e70" },
+    home: { label: "Start page", color: "#c98500" },
   };
   const CHARTS = [
     { id: "traffic", title: "Visits and page views per day", keys: ["visits", "pageviews"], get: (row, k) => row[k] },
@@ -268,6 +270,12 @@
       title: "Play activity by language per day",
       keys: ["sv", "en", "es", "de", "pt", "fr"],
       get: (row, k) => (row.audio ? row.audio[k] : undefined),
+    },
+    {
+      id: "pages",
+      title: "Page views per day by page",
+      keys: ["chess", "home"],
+      get: (row, k) => (row.pages ? row.pages[k] : undefined),
     },
   ];
   const chartState = { range: 30, hidden: {}, redraw: [] };
