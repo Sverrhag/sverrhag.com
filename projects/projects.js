@@ -51,4 +51,14 @@ window.PROJECTS = [
     tags: ["Chess", "Game"],
     thumbnail: "assets/img/projects/best-move-chess.jpg",
   },
+  {
+    title: "Djuräventyret",
+    description:
+      "A game I made for my son. It is a story told on a world map: you travel from Lund in Sweden to the Gold Coast in Australia and learn English from Swedish along the way, across 50 levels. The game is in Swedish.",
+    // Lives on letteradventures.com but is a separate game. Deliberately
+    // does not name the child. The page itself is marked noindex.
+    url: "https://letteradventures.com/zoo-b6cec90c/",
+    tags: ["Kids", "Game", "Swedish"],
+    thumbnail: "assets/img/projects/djuraventyret.jpg",
+  },
 ];
