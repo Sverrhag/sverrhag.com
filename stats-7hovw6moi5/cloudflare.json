@@ -1,6 +1,6 @@
 {
   "source": "Cloudflare, read manually from the dashboard",
-  "snapshotAt": "2026-11-17T05:40:00Z",
+  "snapshotAt": "2026-11-17T07:13:59Z",
   "zones": [
     {
       "domain": "letteradventures.com",
@@ -9,37 +9,37 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "383"
+          "value": "435"
         },
         {
           "label": "Page views",
-          "value": "400"
+          "value": "453"
         },
         {
           "label": "Requests",
-          "value": "11.99k"
+          "value": "13.63k"
         },
         {
           "label": "Data transfer",
-          "value": "117.46 MB"
+          "value": "133.73 MB"
         }
       ],
       "tables": [
         {
           "title": "Play activity by language",
-          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (73 requests across all languages in this period) are included and can land under a language other than the one played.",
+          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (86 requests across all languages in this period) are included and can land under a language other than the one played.",
           "rows": [
             {
               "label": "Swedish",
-              "value": "4.72k"
+              "value": "5.28k"
             },
             {
               "label": "English",
-              "value": "4.02k"
+              "value": "4.59k"
             },
             {
               "label": "Spanish",
-              "value": "571"
+              "value": "574"
             },
             {
               "label": "German",
@@ -51,7 +51,7 @@
             },
             {
               "label": "French",
-              "value": "4"
+              "value": "6"
             }
           ]
         },
@@ -61,7 +61,7 @@
           "rows": [
             {
               "label": "/ (start page, all languages)",
-              "value": "178"
+              "value": "202"
             },
             {
               "label": "/sv/…",
@@ -69,19 +69,23 @@
             },
             {
               "label": "/en/… (game pages)",
-              "value": "17"
+              "value": "13"
             },
             {
               "label": "/de/…",
-              "value": "9"
+              "value": "11"
             },
             {
               "label": "/fr/…",
               "value": "7"
             },
             {
+              "label": "/pt/…",
+              "value": "7"
+            },
+            {
               "label": "/privacy.html",
-              "value": "9"
+              "value": "12"
             }
           ]
         },
@@ -94,34 +98,34 @@
             },
             {
               "label": "United States",
-              "value": "89"
+              "value": "102"
             },
             {
               "label": "Sweden",
-              "value": "80"
+              "value": "81"
             },
             {
               "label": "Germany",
-              "value": "14"
-            },
-            {
-              "label": "Singapore",
-              "value": "10"
+              "value": "24"
             },
             {
               "label": "Canada",
-              "value": "10"
+              "value": "16"
             },
             {
-              "label": "Netherlands",
-              "value": "10"
+              "label": "Singapore",
+              "value": "15"
             },
             {
               "label": "South Korea",
-              "value": "8"
+              "value": "13"
             },
             {
-              "label": "Finland",
+              "label": "Netherlands",
+              "value": "11"
+            },
+            {
+              "label": "Brazil",
               "value": "6"
             }
           ]
@@ -131,11 +135,11 @@
           "rows": [
             {
               "label": "Desktop",
-              "value": "293"
+              "value": "323"
             },
             {
               "label": "Mobile",
-              "value": "106"
+              "value": "129"
             },
             {
               "label": "Tablet",
@@ -153,31 +157,35 @@
             },
             {
               "label": "Unknown/Others",
-              "value": "76"
+              "value": "89"
             },
             {
               "label": "Mobile Safari",
-              "value": "69"
+              "value": "88"
+            },
+            {
+              "label": "Chrome",
+              "value": "58"
             },
             {
               "label": "curl",
               "value": "48"
             },
             {
-              "label": "Chrome",
-              "value": "45"
-            },
-            {
               "label": "Chrome Mobile",
-              "value": "18"
+              "value": "19"
             },
             {
               "label": "Firefox",
-              "value": "5"
+              "value": "8"
             },
             {
-              "label": "AppleBot",
-              "value": "2"
+              "label": "GoogleBot",
+              "value": "4"
+            },
+            {
+              "label": "Edge",
+              "value": "3"
             }
           ]
         }
@@ -200,16 +208,16 @@
         },
         {
           "date": "2026-11-17",
-          "visits": 383,
-          "pageviews": 400,
-          "requests": 11990,
+          "visits": 435,
+          "pageviews": 453,
+          "requests": 13630,
           "audio": {
-            "sv": 4720,
-            "en": 4020,
-            "es": 571,
+            "sv": 5280,
+            "en": 4590,
+            "es": 574,
             "de": 11,
             "pt": 8,
-            "fr": 4
+            "fr": 6
           }
         }
       ]
@@ -222,15 +230,15 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "9"
-        },
-        {
-          "label": "Page views",
           "value": "10"
         },
         {
+          "label": "Page views",
+          "value": "11"
+        },
+        {
           "label": "Best Move Chess page views",
-          "value": "2"
+          "value": "3"
         }
       ],
       "tables": [
@@ -244,7 +252,7 @@
             },
             {
               "label": "/projects/chess/ (Best Move Chess)",
-              "value": "2"
+              "value": "3"
             }
           ]
         },
@@ -253,7 +261,7 @@
           "rows": [
             {
               "label": "Sweden",
-              "value": "8"
+              "value": "9"
             },
             {
               "label": "Finland",
@@ -270,7 +278,7 @@
           "rows": [
             {
               "label": "None (direct)",
-              "value": "9"
+              "value": "10"
             },
             {
               "label": "sverrhag.com",
@@ -282,11 +290,11 @@
           "title": "Devices",
           "rows": [
             {
-              "label": "Mobile",
-              "value": "5"
+              "label": "Desktop",
+              "value": "6"
             },
             {
-              "label": "Desktop",
+              "label": "Mobile",
               "value": "5"
             }
           ]
@@ -296,7 +304,7 @@
           "rows": [
             {
               "label": "Chrome",
-              "value": "4"
+              "value": "5"
             },
             {
               "label": "Unknown",
@@ -318,10 +326,10 @@
         },
         {
           "date": "2026-11-17",
-          "visits": 9,
-          "pageviews": 10,
+          "visits": 10,
+          "pageviews": 11,
           "pages": {
-            "chess": 2,
+            "chess": 3,
             "home": 8
           }
         }
