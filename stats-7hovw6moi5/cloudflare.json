@@ -1,6 +1,6 @@
 {
-  "source": "Cloudflare, read manually from the dashboard",
-  "snapshotAt": "2026-11-18T20:19:56Z",
+  "source": "Cloudflare, read through the analytics API",
+  "snapshotAt": "2026-11-18T20:35:43Z",
   "zones": [
     {
       "domain": "letteradventures.com",
@@ -9,23 +9,27 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "557"
+          "value": "559"
         },
         {
           "label": "Page views",
-          "value": "635"
+          "value": "637"
         },
         {
           "label": "Requests",
-          "value": "7.66k"
+          "value": "7,681"
         },
         {
           "label": "Data transfer",
-          "value": "86.98 MB"
+          "value": "87.13 MB"
         },
         {
           "label": "Djuräventyret page views",
           "value": "3"
+        },
+        {
+          "label": "Server errors (5xx)",
+          "value": "480 (6.25 %)"
         }
       ],
       "tables": [
@@ -35,11 +39,11 @@
           "rows": [
             {
               "label": "Swedish",
-              "value": "2.35k"
+              "value": "2,350"
             },
             {
               "label": "German",
-              "value": "1.06k"
+              "value": "1,063"
             },
             {
               "label": "English",
@@ -61,23 +65,35 @@
         },
         {
           "title": "Landing pages",
-          "note": "Page views grouped by the first part of the address, from Cloudflare's list of top paths, so small pages can be missing. / is not English only: it is where installed apps and returning players in any language start. /en/… pages also keep the visitor's last language.",
+          "note": "Page views grouped by the first part of the address. / is not English only: it is where installed apps and returning players in any language start. /en/… pages also keep the visitor's last language.",
           "rows": [
             {
               "label": "/ (start page, all languages)",
-              "value": "170"
+              "value": "172"
             },
             {
               "label": "/en/… (game pages)",
-              "value": "59"
-            },
-            {
-              "label": "/es/…",
-              "value": "23"
+              "value": "118"
             },
             {
               "label": "/de/…",
-              "value": "19"
+              "value": "69"
+            },
+            {
+              "label": "/es/…",
+              "value": "68"
+            },
+            {
+              "label": "/fr/…",
+              "value": "59"
+            },
+            {
+              "label": "/sv/…",
+              "value": "58"
+            },
+            {
+              "label": "/pt/…",
+              "value": "57"
             },
             {
               "label": "Djuräventyret (private game, separate from Letter Adventures)",
@@ -94,7 +110,7 @@
           "rows": [
             {
               "label": "United States",
-              "value": "226"
+              "value": "225"
             },
             {
               "label": "France",
@@ -135,7 +151,7 @@
           "rows": [
             {
               "label": "Desktop",
-              "value": "554"
+              "value": "556"
             },
             {
               "label": "Mobile",
@@ -149,11 +165,11 @@
         },
         {
           "title": "Browsers",
-          "note": "YandexBot, Unknown/Others and curl are almost entirely crawlers, link previews and scripts, so a large share of the page views are not people.",
+          "note": "Unknown/Others, curl and anything named Bot are almost entirely crawlers, link previews and scripts, so a large share of the page views are not people.",
           "rows": [
             {
               "label": "Unknown/Others",
-              "value": "428"
+              "value": "430"
             },
             {
               "label": "Chrome",
@@ -223,14 +239,14 @@
         },
         {
           "date": "2026-11-18",
-          "visits": 557,
-          "pageviews": 635,
-          "requests": 7660,
+          "visits": 559,
+          "pageviews": 637,
+          "requests": 7681,
           "audio": {
             "sv": 2350,
             "en": 514,
             "es": 0,
-            "de": 1060,
+            "de": 1063,
             "pt": 1,
             "fr": 1
           },
