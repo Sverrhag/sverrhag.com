@@ -1,6 +1,6 @@
 {
   "source": "Cloudflare, read through the analytics API",
-  "snapshotAt": "2026-11-20T07:06:50Z",
+  "snapshotAt": "2026-11-21T07:01:56Z",
   "zones": [
     {
       "domain": "letteradventures.com",
@@ -9,45 +9,45 @@
       "metrics": [
         {
           "label": "Visits",
-          "value": "139"
+          "value": "87"
         },
         {
           "label": "Page views",
-          "value": "178"
+          "value": "134"
         },
         {
           "label": "Requests",
-          "value": "3,405"
+          "value": "4,201"
         },
         {
           "label": "Data transfer",
-          "value": "28.17 MB"
+          "value": "40.37 MB"
         },
         {
           "label": "Djuräventyret page views",
-          "value": "1"
+          "value": "4"
         },
         {
           "label": "Server errors (5xx)",
-          "value": "234 (6.87 %)"
+          "value": "211 (5.02 %)"
         }
       ],
       "tables": [
         {
           "title": "Play activity by language",
-          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (1 requests across all languages in this period) are included and can land under a language other than the one played.",
+          "note": "Requests for voice clips under /audio/<language>/. This is the best signal for which language is actually played, because switching language in the game does not load a new page. Clips are cached by the browser and are not fetched at all when the voice is off, so compare the proportions rather than the absolute numbers. Includes our own test runs. Name clips (5 requests across all languages in this period) are included and can land under a language other than the one played.",
           "rows": [
             {
-              "label": "German",
-              "value": "502"
+              "label": "Swedish",
+              "value": "1,138"
             },
             {
-              "label": "Swedish",
-              "value": "1"
+              "label": "German",
+              "value": "1,029"
             },
             {
               "label": "English",
-              "value": "0"
+              "value": "33"
             },
             {
               "label": "Spanish",
@@ -69,39 +69,39 @@
           "rows": [
             {
               "label": "/ (start page, all languages)",
-              "value": "83"
-            },
-            {
-              "label": "/en/… (game pages)",
-              "value": "48"
-            },
-            {
-              "label": "/es/…",
-              "value": "10"
+              "value": "95"
             },
             {
               "label": "/de/…",
-              "value": "10"
-            },
-            {
-              "label": "/sv/…",
               "value": "8"
             },
             {
+              "label": "/sv/…",
+              "value": "6"
+            },
+            {
               "label": "/pt/…",
-              "value": "7"
+              "value": "6"
+            },
+            {
+              "label": "/en/… (game pages)",
+              "value": "6"
+            },
+            {
+              "label": "/es/…",
+              "value": "3"
             },
             {
               "label": "/fr/…",
-              "value": "7"
+              "value": "3"
             },
             {
               "label": "Djuräventyret (private game, separate from Letter Adventures)",
-              "value": "1"
+              "value": "4"
             },
             {
               "label": "/privacy.html",
-              "value": "4"
+              "value": "3"
             }
           ]
         },
@@ -110,38 +110,38 @@
           "rows": [
             {
               "label": "United States",
-              "value": "54"
-            },
-            {
-              "label": "United Kingdom",
-              "value": "51"
-            },
-            {
-              "label": "Netherlands",
-              "value": "22"
-            },
-            {
-              "label": "Germany",
-              "value": "14"
+              "value": "46"
             },
             {
               "label": "Singapore",
-              "value": "12"
+              "value": "24"
+            },
+            {
+              "label": "Tor",
+              "value": "19"
+            },
+            {
+              "label": "Sweden",
+              "value": "7"
             },
             {
               "label": "China",
+              "value": "7"
+            },
+            {
+              "label": "Germany",
               "value": "6"
             },
             {
-              "label": "Indonesia",
-              "value": "4"
-            },
-            {
-              "label": "Latvia",
-              "value": "2"
+              "label": "Brazil",
+              "value": "5"
             },
             {
               "label": "Belgium",
+              "value": "3"
+            },
+            {
+              "label": "Japan",
               "value": "2"
             }
           ]
@@ -151,11 +151,11 @@
           "rows": [
             {
               "label": "Desktop",
-              "value": "131"
+              "value": "79"
             },
             {
               "label": "Mobile",
-              "value": "47"
+              "value": "55"
             }
           ]
         },
@@ -165,38 +165,34 @@
           "rows": [
             {
               "label": "Chrome",
-              "value": "77"
+              "value": "50"
             },
             {
               "label": "Mobile Safari",
-              "value": "33"
+              "value": "36"
             },
             {
               "label": "Unknown/Others",
-              "value": "30"
-            },
-            {
-              "label": "Chrome derivative",
-              "value": "20"
-            },
-            {
-              "label": "GoogleBot",
-              "value": "6"
+              "value": "27"
             },
             {
               "label": "Chrome Mobile",
-              "value": "5"
+              "value": "10"
             },
             {
-              "label": "Edge",
-              "value": "3"
+              "label": "GoogleBot",
+              "value": "5"
             },
             {
               "label": "Firefox",
               "value": "3"
             },
             {
-              "label": "Safari",
+              "label": "MobileSafariWebview",
+              "value": "2"
+            },
+            {
+              "label": "AppleBot",
               "value": "1"
             }
           ]
@@ -277,6 +273,21 @@
             "fr": 0
           },
           "zoo": 1
+        },
+        {
+          "date": "2026-11-21",
+          "visits": 87,
+          "pageviews": 134,
+          "requests": 4201,
+          "audio": {
+            "sv": 1138,
+            "en": 33,
+            "es": 0,
+            "de": 1029,
+            "pt": 0,
+            "fr": 0
+          },
+          "zoo": 4
         }
       ]
     },
@@ -296,7 +307,7 @@
         },
         {
           "label": "Best Move Chess page views",
-          "value": "0"
+          "value": "1"
         }
       ],
       "tables": [
@@ -306,11 +317,11 @@
           "rows": [
             {
               "label": "/ (start page)",
-              "value": "2"
+              "value": "1"
             },
             {
               "label": "/projects/chess/ (Best Move Chess)",
-              "value": "0"
+              "value": "1"
             }
           ]
         },
@@ -328,11 +339,7 @@
           "rows": [
             {
               "label": "None (direct)",
-              "value": "1"
-            },
-            {
-              "label": "www.google.com",
-              "value": "1"
+              "value": "2"
             }
           ]
         },
@@ -340,7 +347,7 @@
           "title": "Devices",
           "rows": [
             {
-              "label": "Mobile",
+              "label": "Desktop",
               "value": "2"
             }
           ]
@@ -349,12 +356,8 @@
           "title": "Browsers",
           "rows": [
             {
-              "label": "Chrome Mobile",
-              "value": "1"
-            },
-            {
-              "label": "Mobile Safari",
-              "value": "1"
+              "label": "Unknown/Others",
+              "value": "2"
             }
           ]
         }
@@ -400,6 +403,15 @@
           "pages": {
             "chess": 0,
             "home": 2
+          }
+        },
+        {
+          "date": "2026-11-21",
+          "visits": 2,
+          "pageviews": 2,
+          "pages": {
+            "chess": 1,
+            "home": 1
           }
         }
       ]
